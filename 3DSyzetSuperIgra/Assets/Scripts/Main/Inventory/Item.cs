@@ -1,0 +1,33 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+// Базовый класс Item
+public abstract class Item : ScriptableObject
+{
+    public FieldLocalize itemName;
+    public Sprite itemIcon;
+    public GameObject itemPrefab;
+}
+
+// Класс для ключей
+[CreateAssetMenu(fileName = "Key", menuName = "Super3DGame/Items/Key")]
+public class KeyItem : Item
+{
+    public int keyLevel = 1;
+    public string keyID = "";
+    
+}
+
+// Класс для лечения
+[CreateAssetMenu(fileName = "HealItem", menuName = "Super3DGame/Items/Heal")]
+public class HealItem : Item
+{
+    public int healAmount = 20;
+}
+
+// Класс для автомобильных предметов
+[CreateAssetMenu(fileName = "CarAttribute", menuName = "Super3DGame/Items/CarAttribute")]
+public class CarAttributeItem : Item
+{
+    
+}
