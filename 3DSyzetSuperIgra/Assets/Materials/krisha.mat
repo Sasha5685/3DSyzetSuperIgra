@@ -7,9 +7,9 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pososi
-  m_Shader: {fileID: 46, guid: 0000000000000000f000000000000000, type: 0}
-  m_Parent: {fileID: 2100000, guid: 27d99617f6c5eae49a72988ff584e40c, type: 2}
+  m_Name: krisha
+  m_Shader: {fileID: 4800000, guid: 1ccecd9b89b8a4f14bfb64f29ddfcc81, type: 3}
+  m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords: []
   m_InvalidKeywords: []
@@ -23,17 +23,14 @@ Material:
   m_SavedProperties:
     serializedVersion: 3
     m_TexEnvs:
-    - _EmissionMap:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 0.1, y: 0.16}
-        m_Offset: {x: 0, y: 0}
     - _MainTex:
-        m_Texture: {fileID: 2800000, guid: c1187df11e39c85499d59259f2c482bb, type: 3}
-        m_Scale: {x: 0.1, y: 0.16}
+        m_Texture: {fileID: 2800000, guid: 265076c22b5b41e4688f70665e99b1fa, type: 3}
+        m_Scale: {x: 0.19, y: 0.53}
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
-    - _Glossiness: 0
+    - _Glossiness: 0.5
     - _Metallic: 0
-    m_Colors: []
+    m_Colors:
+    - _Color: {r: 1, g: 1, b: 1, a: 1}
   m_BuildTextureStacks: []
