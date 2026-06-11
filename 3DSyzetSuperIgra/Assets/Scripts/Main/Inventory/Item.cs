@@ -7,6 +7,7 @@ public abstract class Item : ScriptableObject
     public FieldLocalize itemName;
     public Sprite itemIcon;
     public GameObject itemPrefab;
+    public GameObject itemModel;
 }
 
 // Класс для ключей

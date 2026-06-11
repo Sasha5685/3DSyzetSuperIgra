@@ -1,10 +1,11 @@
 using UnityEngine;
+using System.Collections;
 
 public class ItemPickup : MonoBehaviour
 {
     [Header("Настройки рейкаста")]
     [SerializeField] private float pickupRadius = 2f;
-    [SerializeField] private float pickupAngle = 360f; // Полный круг
+    [SerializeField] private float pickupAngle = 360f;
     [SerializeField] private LayerMask itemLayer;
     [SerializeField] private Transform playerCamera;
     
@@ -16,16 +17,24 @@ public class ItemPickup : MonoBehaviour
     [SerializeField] private bool showDebugGizmo = true;
     [SerializeField] private Color gizmoColor = Color.green;
     
+    [Header("Highlight Settings")]
+    [SerializeField] private float highlightCheckInterval = 0.1f;
+    
     private GameObject currentItemInRange;
+    private ItemPickupable currentPickupable;
     [SerializeField] private Inventory inventory;
     
+    private float lastCheckTime = 0f;
     
     void Update()
     {
-        // Круговой рейкаст для поиска предметов
-        FindItemsInRadius();
+        // Оптимизация - не каждый кадр ищем предметы
+        if (Time.time - lastCheckTime > highlightCheckInterval)
+        {
+            lastCheckTime = Time.time;
+            FindItemsInRadius();
+        }
         
-        // Поднятие предмета по кнопке
         if (Input.GetKeyDown(pickupKey) && currentItemInRange != null)
         {
             PickupItem();
@@ -34,41 +43,70 @@ public class ItemPickup : MonoBehaviour
     
     void FindItemsInRadius()
     {
-        // Получаем все коллайдеры в радиусе
         Collider[] hitColliders = Physics.OverlapSphere(transform.position, pickupRadius, itemLayer);
         
         GameObject closestItem = null;
+        ItemPickupable closestPickupable = null;
         float closestDistance = pickupDistance + 1f;
+        float closestAngle = pickupAngle / 2f + 1f;
         
         foreach (var collider in hitColliders)
         {
-            // Проверяем расстояние
             float distanceToItem = Vector3.Distance(playerCamera.position, collider.transform.position);
             if (distanceToItem > pickupDistance)
                 continue;
             
-            // Проверяем угол между направлением взгляда и предметом
             Vector3 directionToItem = (collider.transform.position - playerCamera.position).normalized;
             float angleToItem = Vector3.Angle(playerCamera.forward, directionToItem);
             
-            // Проверяем, находится ли предмет в угле обзора
             if (angleToItem <= pickupAngle / 2f)
             {
-                // Дополнительная проверка прямым лучом (нет ли препятствий)
                 if (IsVisible(collider.transform.position, collider.gameObject))
                 {
-                    if (distanceToItem < closestDistance)
+                    // Приоритет: сначала по углу (ближе к центру), потом по расстоянию
+                    bool isBetter = false;
+                    
+                    if (angleToItem < closestAngle)
+                    {
+                        isBetter = true;
+                    }
+                    else if (Mathf.Abs(angleToItem - closestAngle) < 0.1f && distanceToItem < closestDistance)
+                    {
+                        isBetter = true;
+                    }
+                    
+                    if (isBetter)
                     {
                         closestDistance = distanceToItem;
+                        closestAngle = angleToItem;
                         closestItem = collider.gameObject;
+                        closestPickupable = collider.GetComponent<ItemPickupable>();
                     }
                 }
             }
         }
-        currentItemInRange = closestItem;
+        
+        // Обновляем подсветку
+        if (currentItemInRange != closestItem)
+        {
+            // Снимаем подсветку с предыдущего предмета
+            if (currentPickupable != null)
+            {
+                currentPickupable.Highlight(false);
+            }
+            
+            // Устанавливаем новый предмет
+            currentItemInRange = closestItem;
+            currentPickupable = closestPickupable;
+            
+            // Включаем подсветку на новом предмете
+            if (currentPickupable != null)
+            {
+                currentPickupable.Highlight(true);
+            }
+        }
     }
     
-    // ИСПРАВЛЕНО: передаем targetObject для проверки
     bool IsVisible(Vector3 targetPosition, GameObject targetObject)
     {
         Vector3 direction = targetPosition - playerCamera.position;
@@ -76,7 +114,6 @@ public class ItemPickup : MonoBehaviour
         
         if (Physics.Raycast(playerCamera.position, direction, out hit, pickupDistance))
         {
-            // Проверяем, попали ли мы в целевой предмет
             return hit.collider.gameObject == targetObject;
         }
         return false;
@@ -88,19 +125,20 @@ public class ItemPickup : MonoBehaviour
         {
             ItemPickupable pickupable = currentItemInRange.GetComponent<ItemPickupable>();
             
-            if (pickupable != null && pickupable.itemData != null)
+            if (pickupable != null)
             {
-                if (inventory != null)
-                {
-                    inventory.AddItem(pickupable.itemData);
-                    Destroy(currentItemInRange);
-                    currentItemInRange = null;
-                    Debug.Log($"Поднят предмет: {pickupable.itemData.name}");
-                }
-                else
-                {
-                    Debug.LogError("Inventory не найден!");
-                }
+                pickupable.OnPickup(gameObject);
+                
+                if (pickupable.itemData_1 != null)
+                    inventory.AddItem(pickupable.itemData_1);
+                else if (pickupable.itemData_2 != null)
+                    inventory.AddItem(pickupable.itemData_2);
+                else if (pickupable.itemData_3 != null)
+                    inventory.AddItem(pickupable.itemData_3);
+                
+                Destroy(currentItemInRange);
+                currentItemInRange = null;
+                currentPickupable = null;
             }
             else
             {
@@ -113,17 +151,14 @@ public class ItemPickup : MonoBehaviour
     {
         if (!showDebugGizmo) return;
         
-        // Радиус поиска
         Gizmos.color = gizmoColor;
         Gizmos.DrawWireSphere(transform.position, pickupRadius);
         
         if (playerCamera != null)
         {
-            // Радиус поднятия
             Gizmos.color = Color.yellow;
             Gizmos.DrawWireSphere(playerCamera.position, pickupDistance);
             
-            // Визуализация угла обзора
             Vector3 forward = playerCamera.forward;
             Vector3 rightBoundary = Quaternion.Euler(0, pickupAngle / 2f, 0) * forward;
             Vector3 leftBoundary = Quaternion.Euler(0, -pickupAngle / 2f, 0) * forward;
@@ -133,7 +168,6 @@ public class ItemPickup : MonoBehaviour
             Gizmos.DrawRay(playerCamera.position, leftBoundary * pickupDistance);
         }
         
-        // Визуализация текущего предмета
         if (currentItemInRange != null)
         {
             Gizmos.color = Color.red;
