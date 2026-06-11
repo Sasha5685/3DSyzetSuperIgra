@@ -32,7 +32,8 @@ public class PlayerController : MonoBehaviour
     private float runSpeed = 10f;
     private float gravity = -9.81f;
     public bool RunningGame;
-        public GameObject BlackPanelStopGame;
+    public GameObject BlackPanelStopGame;
+    public GameObject MobilePanel;
     public void SetDeviceType(string deviceType)
     {
         instatiate = this;
@@ -42,6 +43,7 @@ public class PlayerController : MonoBehaviour
         {
             Cursor.lockState = CursorLockMode.None;
             Cursor.visible = true;
+            MobilePanel.SetActive(true);
         }
         else
         {
@@ -49,7 +51,7 @@ public class PlayerController : MonoBehaviour
             Cursor.visible = false;
         }
     }
-        public void StopGame()
+    public void StopGame()
     {
         RunningGame = false;
         BlackPanelStopGame.SetActive(true);
@@ -85,6 +87,7 @@ public class PlayerController : MonoBehaviour
         {
             TogglePause();
         }
+        if(RunningGame == false)return;
         if (!isMobilePlatform)
         {
             HandleMouseLook();
@@ -267,34 +270,4 @@ public class PlayerController : MonoBehaviour
     {
         jumpPressed = true;
     }
-    private void SetCursor(bool Set)
-    {
-        if(Set == true)
-        {
-            if (isMobilePlatform)
-            {
-                Cursor.lockState = CursorLockMode.None;
-                Cursor.visible = Set;
-            }
-            else
-            {
-                Cursor.lockState = CursorLockMode.None;
-                Cursor.visible = Set;
-            }
-        }
-        if(Set == false)
-        {
-            if (isMobilePlatform)
-            {
-                Cursor.lockState = CursorLockMode.None;
-                Cursor.visible = Set;
-            }
-            else
-            {
-                Cursor.lockState = CursorLockMode.Locked;
-                Cursor.visible = Set;
-            }
-        }
-    }
-
 }
