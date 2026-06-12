@@ -4,9 +4,7 @@ using System.Collections;
 
 public class ItemPickupable : MonoBehaviour, Entety
 {   
-    public KeyItem itemData_1;
-    public HealItem itemData_2;
-    public CarAttributeItem itemData_3;
+    [SerializeField] private Item itemData; // ОДНО поле для ЛЮБОГО предмета
     
     [Header("Default Outline")]
     [SerializeField] private float defaultOutlineWidth = 0.15f;
@@ -157,12 +155,8 @@ public class ItemPickupable : MonoBehaviour, Entety
     
     public Item ReturnItem()
     {
-        if (itemData_1 != null) return itemData_1;
-        if (itemData_2 != null) return itemData_2;
-        if (itemData_3 != null) return itemData_3;
-        
-        Debug.LogError($"No item data assigned to {gameObject.name}");
-        return null;
+        return itemData;
+    
     }
     
     void OnDestroy()

@@ -15,7 +15,10 @@ public class Inventory : MonoBehaviour
     
     private int currentSelectedSlotIndex = 0;
     private bool isInitialized = false;
-    
+    [Header("Sound Settings")]
+    [SerializeField] private AudioClip pickupSound;
+        [SerializeField] private AudioClip KickSound;
+    [SerializeField] [Range(0f, 1f)] private float pickupVolume = 0.7f;
     void Start()
     {
         StartCoroutine(InitializeInventory());
@@ -102,7 +105,7 @@ public class Inventory : MonoBehaviour
             Debug.LogWarning("Выбранный слот пуст");
             return;
         }
-        
+
         // Получаем предмет
         Item itemToThrow = currentSlot.Item;
         
@@ -111,7 +114,7 @@ public class Inventory : MonoBehaviour
             Debug.LogWarning("У предмета нет префаба для броска");
             return;
         }
-        
+                PlayKickSound();
         // Создаем физический объект для броска
         GameObject thrownItem = Instantiate(itemToThrow.itemPrefab, GetThrowPosition(), Quaternion.identity);
         
@@ -275,7 +278,7 @@ public class Inventory : MonoBehaviour
     public void AddItem(Item NewItem)
     {
         if (SlotsInventory == null) return;
-        
+        PlayPickupSound();
         for (int i = 0; i < SlotsInventory.Length; i++)
         {
             if (SlotsInventory[i] != null && SlotsInventory[i].IsEmpety())
@@ -286,5 +289,13 @@ public class Inventory : MonoBehaviour
         }
         
         Debug.LogWarning("Нет свободных слотов для добавления предмета");
+    }
+    private void PlayPickupSound()
+    {
+            AudioSource.PlayClipAtPoint(pickupSound, Camera.main.transform.position, pickupVolume);
+    }
+    private void PlayKickSound()
+    {
+            AudioSource.PlayClipAtPoint(KickSound, Camera.main.transform.position, pickupVolume);
     }
 }

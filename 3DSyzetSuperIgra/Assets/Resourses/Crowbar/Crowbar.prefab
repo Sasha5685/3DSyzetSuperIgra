@@ -15,6 +15,7 @@ GameObject:
   - component: {fileID: 2435518993051193712}
   - component: {fileID: 6535854444961098016}
   - component: {fileID: 703284710228947442}
+  - component: {fileID: 2423295727069675939}
   m_Layer: 7
   m_Name: Crowbar
   m_TagString: Untagged
@@ -100,9 +101,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6191114422a9c47409f7db0aa1d12c17, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  itemData_1: {fileID: 11400000, guid: 3849ca4eeece8b44eb14c5230ec4cd59, type: 2}
-  itemData_2: {fileID: 0}
-  itemData_3: {fileID: 0}
+  itemData: {fileID: 11400000, guid: 3849ca4eeece8b44eb14c5230ec4cd59, type: 2}
   defaultOutlineWidth: 3
   defaultColor: {r: 0.3160377, g: 0.6987228, b: 1, a: 0.7176471}
   highlightOutlineWidth: 6
@@ -177,3 +176,16 @@ MonoBehaviour:
   precomputeOutline: 0
   bakeKeys: []
   bakeValues: []
+--- !u!114 &2423295727069675939
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7037774076862404855}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d7bc5f8d46892ff4f8ec3b50156d3f58, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  includeChildren: 1

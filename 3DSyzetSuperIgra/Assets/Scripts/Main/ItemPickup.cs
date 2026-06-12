@@ -65,7 +65,13 @@ public class ItemPickup : MonoBehaviour
     private void InteractWithObject()
     {
         if (!currentItemInRange) return;
-        
+
+        WoodPlanks woodPlanks = currentItemInRange.GetComponent<WoodPlanks>();
+        if (woodPlanks != null)
+        {
+            woodPlanks.Interact();
+                        return;
+        }
         // Пытаемся получить компонент двери
         DoorController door = currentItemInRange.GetComponent<DoorController>();
         if (door != null)
