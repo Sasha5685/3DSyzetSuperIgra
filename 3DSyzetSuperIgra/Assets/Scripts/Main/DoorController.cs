@@ -13,6 +13,7 @@ public class DoorController : MonoBehaviour, Entety
     [Header("Audio Settings")]
     [SerializeField] private AudioSource audioSource;
     [SerializeField] private AudioClip openSound;
+        [SerializeField] private AudioClip RepitOpenDoorSound;
     [SerializeField] private AudioClip closeSound;
     [SerializeField] private float soundVolume = 1f;
     
@@ -44,6 +45,7 @@ public class DoorController : MonoBehaviour, Entety
     private Coroutine animationCoroutine;
     private bool isAnimating = false;
     private bool playerLayerWasExcluded = false;
+    public bool LockDoor;
     
     void Awake()
     {
@@ -285,7 +287,11 @@ public class DoorController : MonoBehaviour, Entety
     {
         
         if (isAnimating) return;
-        
+        if(LockDoor == true)
+        {
+            RepitOpenDoor();
+            return;
+        }
         if (!isOpen)
         {
             OpenDoor();
@@ -296,6 +302,41 @@ public class DoorController : MonoBehaviour, Entety
         }
     }
     
+    private void RepitOpenDoor()
+    {
+        PlaySound(RepitOpenDoorSound);
+        
+        if (doorAnimator != null)
+        {
+            // Останавливаем текущую анимацию если есть
+            if (isAnimating) return;
+            
+            isAnimating = true;
+            
+            // Включаем animator
+            doorAnimator.enabled = true;
+            
+            // Запускаем анимацию неудачной попытки открытия
+            doorAnimator.SetTrigger("RepitOpen");
+            
+            StartCoroutine(WaitForAnimation(() => {
+                isAnimating = false;
+                
+                // Отключаем animator после анимации
+                if (doorAnimator != null)
+                {
+                    // Возвращаем дверь в исходное состояние
+                    if (isOpen)
+                        doorAnimator.Play("DoorOpen", 0, 1f);
+                    else
+                        doorAnimator.Play("DoorClosed", 0, 0f);
+                    
+                    doorAnimator.Update(0f);
+                    doorAnimator.enabled = false;
+                }
+            }));
+        }
+    }
     private void OpenDoor()
     {
         
