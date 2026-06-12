@@ -260,8 +260,6 @@ public class Inventory : MonoBehaviour
                 handItem.ClearCurrentItem();
             }
         }
-        
-        Debug.Log($"Выбран слот {currentSelectedSlotIndex + 1} с предметом: {(slot.Item != null ? slot.Item.itemName.GetString("Russian") : "Пусто")}");
     }
     
     public Slot GetCurrentSelectedSlot()

@@ -1,17 +1,18 @@
 using UnityEngine;
+using System;
 using System.Collections;
 
-public class ItemPickupable : MonoBehaviour
+public class ItemPickupable : MonoBehaviour, Entety
 {   
     public KeyItem itemData_1;
     public HealItem itemData_2;
     public CarAttributeItem itemData_3;
     
-    [Header("Default Outline (Always Active)")]
+    [Header("Default Outline")]
     [SerializeField] private float defaultOutlineWidth = 0.15f;
-    [SerializeField] private Color defaultColor = new Color(1f, 1f, 1f, 0.5f); // Полупрозрачный белый
+    [SerializeField] private Color defaultColor = new Color(1f, 1f, 1f, 0.5f);
     
-    [Header("Highlight Outline (On Hover)")]
+    [Header("Highlight Outline")]
     [SerializeField] private float highlightOutlineWidth = 0.6f;
     [SerializeField] private Color highlightColor = Color.yellow;
     [SerializeField] private float highlightAnimationSpeed = 8f;
@@ -22,16 +23,17 @@ public class ItemPickupable : MonoBehaviour
     [SerializeField] private float pulseAmplitude = 0.2f;
     
     private Outline outlineComponent;
-    private float currentOutlineWidth;
-    private Color currentOutlineColor;
+    private float targetWidth;
+    private Color targetColor;
+    private float currentWidth;
+    private Color currentColor;
     private bool isHighlighted = false;
-    private bool isInitialized = false;
     private float pulseTimer = 0f;
+    private Coroutine animationCoroutine;
     
-    void Start()
+    void Awake()
     {
         SetupOutline();
-        StartCoroutine(InitializeWithDelay());
     }
     
     void SetupOutline()
@@ -43,71 +45,129 @@ public class ItemPickupable : MonoBehaviour
             outlineComponent = gameObject.AddComponent<Outline>();
         }
         
-        // Настройка Outline
         outlineComponent.OutlineColor = defaultColor;
         outlineComponent.OutlineWidth = defaultOutlineWidth;
-        outlineComponent.enabled = true; // Всегда включен
+        outlineComponent.enabled = true;
         
-        currentOutlineWidth = defaultOutlineWidth;
-        currentOutlineColor = defaultColor;
+        currentWidth = defaultOutlineWidth;
+        currentColor = defaultColor;
+        targetWidth = defaultOutlineWidth;
+        targetColor = defaultColor;
     }
     
-    IEnumerator InitializeWithDelay()
+    public void Pointing()
     {
-        yield return null; // Ждем один кадр
-        isInitialized = true;
+        isHighlighted = true;
+        targetWidth = highlightOutlineWidth;
+        targetColor = highlightColor;
+        
+        if (animationCoroutine != null)
+            StopCoroutine(animationCoroutine);
+        animationCoroutine = StartCoroutine(AnimateOutline());
     }
     
-    void Update()
+    public void StopPointing()
     {
-        if (!isInitialized) return;
+        isHighlighted = false;
+        targetWidth = defaultOutlineWidth;
+        targetColor = defaultColor;
+        pulseTimer = 0f;
         
-        // Определяем целевые значения
-        float targetWidth = isHighlighted ? highlightOutlineWidth : defaultOutlineWidth;
-        Color targetColor = isHighlighted ? highlightColor : defaultColor;
+        if (animationCoroutine != null)
+            StopCoroutine(animationCoroutine);
+        animationCoroutine = StartCoroutine(AnimateOutline());
+    }
+    
+    private IEnumerator AnimateOutline()
+    {
+        float animationDuration = 1f / highlightAnimationSpeed;
+        float elapsedTime = 0f;
         
-        // Добавляем пульсацию если выделен
+        float startWidth = currentWidth;
+        Color startColor = currentColor;
+        
+        while (elapsedTime < animationDuration)
+        {
+            elapsedTime += Time.deltaTime;
+            float t = elapsedTime / animationDuration;
+            
+            // Плавный lerp к целевым значениям
+            currentWidth = Mathf.Lerp(startWidth, targetWidth, t);
+            currentColor = Color.Lerp(startColor, targetColor, t);
+            
+            // Добавляем пульсацию если выделен
+            float finalWidth = currentWidth;
+            if (isHighlighted && enablePulseEffect)
+            {
+                pulseTimer += Time.deltaTime * pulseSpeed;
+                float pulse = Mathf.Sin(pulseTimer) * pulseAmplitude;
+                finalWidth += pulse;
+            }
+            
+            if (outlineComponent != null)
+            {
+                outlineComponent.OutlineWidth = finalWidth;
+                outlineComponent.OutlineColor = currentColor;
+            }
+            
+            yield return null;
+        }
+        
+        // Финальные значения
+        currentWidth = targetWidth;
+        currentColor = targetColor;
+        
+        if (outlineComponent != null)
+        {
+            outlineComponent.OutlineWidth = targetWidth;
+            outlineComponent.OutlineColor = targetColor;
+        }
+        
+        // Если нужна постоянная пульсация, запускаем её отдельно
         if (isHighlighted && enablePulseEffect)
         {
-            pulseTimer += Time.deltaTime * pulseSpeed;
-            float pulse = Mathf.Sin(pulseTimer) * pulseAmplitude;
-            targetWidth += pulse;
+            animationCoroutine = StartCoroutine(PulseCoroutine());
         }
         else
         {
-            pulseTimer = 0f;
+            animationCoroutine = null;
+        }
+    }
+    
+    private IEnumerator PulseCoroutine()
+    {
+        while (isHighlighted && enablePulseEffect && outlineComponent != null)
+        {
+            pulseTimer += Time.deltaTime * pulseSpeed;
+            float pulse = Mathf.Sin(pulseTimer) * pulseAmplitude;
+            outlineComponent.OutlineWidth = targetWidth + pulse;
+            yield return null;
         }
         
-        // Плавное изменение
-        currentOutlineWidth = Mathf.Lerp(currentOutlineWidth, targetWidth, Time.deltaTime * highlightAnimationSpeed);
-        currentOutlineColor = Color.Lerp(currentOutlineColor, targetColor, Time.deltaTime * highlightAnimationSpeed);
-        
-        outlineComponent.OutlineWidth = currentOutlineWidth;
-        outlineComponent.OutlineColor = currentOutlineColor;
+        if (outlineComponent != null && !isHighlighted)
+            outlineComponent.OutlineWidth = targetWidth;
+            
+        animationCoroutine = null;
     }
     
-    public void Highlight(bool highlight)
+    public void UseblePointing()
     {
-        isHighlighted = highlight;
+        Pointing();
     }
     
-    public void OnPickup(GameObject picker)
+    public Item ReturnItem()
     {
-        StartCoroutine(PickupEffect());
+        if (itemData_1 != null) return itemData_1;
+        if (itemData_2 != null) return itemData_2;
+        if (itemData_3 != null) return itemData_3;
+        
+        Debug.LogError($"No item data assigned to {gameObject.name}");
+        return null;
     }
     
-    IEnumerator PickupEffect()
+    void OnDestroy()
     {
-        // Вспышка при поднятии
-        float originalWidth = currentOutlineWidth;
-        Color originalColor = currentOutlineColor;
-        
-        outlineComponent.OutlineColor = Color.white;
-        outlineComponent.OutlineWidth = 1f;
-        
-        yield return new WaitForSeconds(0.15f);
-        
-        outlineComponent.OutlineColor = originalColor;
-        outlineComponent.OutlineWidth = originalWidth;
+        if (animationCoroutine != null && gameObject.activeInHierarchy)
+            StopCoroutine(animationCoroutine);
     }
 }
