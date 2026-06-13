@@ -62,17 +62,26 @@ public class ItemPickup : MonoBehaviour
         currentPickupable?.Pointing();
     }
     
+    // Добавьте этот метод в класс ItemPickup
     private void InteractWithObject()
     {
         if (!currentItemInRange) return;
+
+        // Проверяем, является ли объект машиной
+        CarController car = currentItemInRange.GetComponent<CarController>();
+        if (car != null)
+        {
+            car.Interact();
+            return;
+        }
 
         WoodPlanks woodPlanks = currentItemInRange.GetComponent<WoodPlanks>();
         if (woodPlanks != null)
         {
             woodPlanks.Interact();
-                        return;
+            return;
         }
-        // Пытаемся получить компонент двери
+        
         DoorController door = currentItemInRange.GetComponent<DoorController>();
         if (door != null)
         {
@@ -80,28 +89,17 @@ public class ItemPickup : MonoBehaviour
             return;
         }
         
-        // Если не дверь, пробуем поднять предмет
+        // Поднятие предмета
         Entety entety = currentPickupable;
         if (entety != null)
         {
-            Item item = entety.ReturnItem();
+            BaseItem item = entety.ReturnItem();
             if (item != null)
             {
                 inventory.AddItem(item);
-                
-                ItemPickupable itemComp = currentItemInRange.GetComponent<ItemPickupable>();
-                if (itemComp != null)
-                {
-                    Destroy(currentItemInRange);
-                    currentItemInRange = null;
-                    currentPickupable = null;
-                }
-                else
-                {
-                    Destroy(currentItemInRange);
-                    currentItemInRange = null;
-                    currentPickupable = null;
-                }
+                Destroy(currentItemInRange);
+                currentItemInRange = null;
+                currentPickupable = null;
             }
         }
     }

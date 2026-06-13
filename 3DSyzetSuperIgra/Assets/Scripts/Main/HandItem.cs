@@ -12,7 +12,7 @@ public class HandItem : MonoBehaviour
     public Vector3 defaultScale = Vector3.one;
     
     private GameObject currentItemModel;
-    private Item currentItem;
+    private BaseItem  currentItem;
     
     private void Start()
     {
@@ -20,7 +20,7 @@ public class HandItem : MonoBehaviour
         handCamera.depth = 1;
     }
     
-    public void ShowItem(Item item)
+    public void ShowItem(BaseItem  item)
     {
         ClearCurrentItem();
         if (item == null || item.itemModel == null){return;}
@@ -39,7 +39,7 @@ public class HandItem : MonoBehaviour
         currentItem = null;
     }
     
-    public Item GetCurrentItem()
+    public BaseItem  GetCurrentItem()
     {
         return currentItem;
     }

@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 // Базовый класс Item
-public abstract class Item : ScriptableObject
+public class BaseItem  : ScriptableObject
 {
     public FieldLocalize itemName;
     public Sprite itemIcon;
@@ -12,7 +12,7 @@ public abstract class Item : ScriptableObject
 
 // Класс для ключей
 [CreateAssetMenu(fileName = "Key", menuName = "Super3DGame/Items/Key")]
-public class KeyItem : Item
+public class KeyItem : BaseItem 
 {
     public int keyLevel = 1;
     public string keyID = "";
@@ -21,14 +21,14 @@ public class KeyItem : Item
 
 // Класс для лечения
 [CreateAssetMenu(fileName = "HealItem", menuName = "Super3DGame/Items/Heal")]
-public class HealItem : Item
+public class HealItem : BaseItem 
 {
     public int healAmount = 20;
 }
 
 // Класс для автомобильных предметов
 [CreateAssetMenu(fileName = "CarAttribute", menuName = "Super3DGame/Items/CarAttribute")]
-public class CarAttributeItem : Item
+public class CarAttributeItem : BaseItem 
 {
     
 }

@@ -5,10 +5,9 @@ using System;
 
 public class WoodPlanks : MonoBehaviour, Entety
 {
-    [SerializeField] private Item itemData; // ОДНО поле для ЛЮБОГО предмета
     
     [Header("Required Item to Destroy")]
-    [SerializeField] private Item requiredItem; // Какой предмет нужен в руках
+    [SerializeField] private BaseItem  requiredItem; // Какой предмет нужен в руках
     
     [Header("Default Outline")]
     [SerializeField] private float defaultOutlineWidth = 0.15f;
@@ -172,9 +171,9 @@ public class WoodPlanks : MonoBehaviour, Entety
         Pointing();
     }
     
-    public Item ReturnItem()
+    public BaseItem  ReturnItem()
     {
-        return itemData;
+        return null;
     }
     
 
@@ -235,7 +234,7 @@ public class WoodPlanks : MonoBehaviour, Entety
             return false;
         }
         
-        Item currentItem = currentSlot.Item;
+        BaseItem  currentItem = currentSlot.Item;
         
         if (requiredItem != null && currentItem != null)
         {

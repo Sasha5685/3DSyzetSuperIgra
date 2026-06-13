@@ -107,7 +107,7 @@ public class Inventory : MonoBehaviour
         }
 
         // Получаем предмет
-        Item itemToThrow = currentSlot.Item;
+        BaseItem  itemToThrow = currentSlot.Item;
         
         if (itemToThrow == null || itemToThrow.itemPrefab == null)
         {
@@ -275,7 +275,7 @@ public class Inventory : MonoBehaviour
         return null;
     }
     
-    public void AddItem(Item NewItem)
+    public void AddItem(BaseItem  NewItem)
     {
         if (SlotsInventory == null) return;
         PlayPickupSound();

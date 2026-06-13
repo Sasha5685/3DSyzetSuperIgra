@@ -4,7 +4,7 @@ using System.Collections;
 
 public class ItemPickupable : MonoBehaviour, Entety
 {   
-    [SerializeField] private Item itemData; // ОДНО поле для ЛЮБОГО предмета
+    [SerializeField] private BaseItem  itemData; // ОДНО поле для ЛЮБОГО предмета
     
     [Header("Default Outline")]
     [SerializeField] private float defaultOutlineWidth = 0.15f;
@@ -153,7 +153,7 @@ public class ItemPickupable : MonoBehaviour, Entety
         Pointing();
     }
     
-    public Item ReturnItem()
+    public BaseItem  ReturnItem()
     {
         return itemData;
     

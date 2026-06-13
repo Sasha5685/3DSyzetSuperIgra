@@ -277,7 +277,7 @@ public class DoorController : MonoBehaviour, Entety
         Pointing();
     }
     
-    public Item ReturnItem()
+    public BaseItem  ReturnItem()
     {
         Debug.LogWarning("DoorController: ReturnItem called but doors don't return items!");
         return null;

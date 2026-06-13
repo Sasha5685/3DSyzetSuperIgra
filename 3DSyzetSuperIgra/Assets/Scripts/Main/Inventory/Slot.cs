@@ -10,7 +10,7 @@ public class Slot : MonoBehaviour, IPointerClickHandler
     public int IdSlot;
     public Image UISlot;
     public TextMeshProUGUI UIName;
-    public Item Item;
+    public BaseItem  Item;
     public GameObject Selected;
     
     void Start()
@@ -38,7 +38,7 @@ public class Slot : MonoBehaviour, IPointerClickHandler
         }
     }
     
-    public void SetItem(Item newItem) // Обновите существующий метод
+    public void SetItem(BaseItem  newItem) // Обновите существующий метод
     {
         Item = newItem;
         
