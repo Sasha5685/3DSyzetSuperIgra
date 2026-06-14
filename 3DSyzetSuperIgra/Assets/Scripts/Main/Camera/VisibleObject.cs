@@ -7,7 +7,12 @@ public class VisibleObject : MonoBehaviour
     private Renderer[] renderers;
     private bool hidden;
     private Outline outline;
-
+    private bool ignoreManager = false;
+    
+    public void SetIgnoreManager(bool ignore)
+    {
+        ignoreManager = ignore;
+    }
     private void Awake()
     {
                 outline = GetComponent<Outline>();
@@ -34,6 +39,7 @@ public void UpdateVisibility(float sqrDistance,
                              float outlineDistanceSqr,
                              float hideDistanceSqr)
 {
+    if (ignoreManager) return;
     if (sqrDistance > hideDistanceSqr)
     {
         SetVisible(false);

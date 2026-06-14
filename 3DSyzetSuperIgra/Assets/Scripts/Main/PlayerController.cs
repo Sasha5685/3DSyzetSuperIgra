@@ -3,7 +3,7 @@ using UnityEngine.EventSystems;
 public class PlayerController : MonoBehaviour
 {    
     public static PlayerController instatiate;
-    [SerializeField] private Camera playerCamera;
+    [SerializeField] public Camera playerCamera;
     [SerializeField] private float jumpHeight = 1.5f;
     [SerializeField] private Transform groundCheck;
     private float groundDistance = 0.4f;
