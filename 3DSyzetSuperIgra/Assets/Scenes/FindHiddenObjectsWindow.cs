@@ -1,3 +1,4 @@
+#if UNITY_EDITOR
 using UnityEngine;
 using UnityEditor;
 using System.Collections.Generic;
@@ -55,3 +56,4 @@ public class FindHiddenObjectsWindow : EditorWindow
         EditorUtility.DisplayDialog("Результат", $"Найдено скрытых объектов: {hiddenObjects.Count}\nИмена выведены в Console.", "OK");
     }
 }
+#endif
