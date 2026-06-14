@@ -1,0 +1,15 @@
+{
+    "stringPrefs": [
+        {
+            "key": "SelectModuleToggle_YG2",
+            "value": "RewardedAdv;InterstitialAdv;Localization;AutoTranslateLangs;Leaderboards;RedefinePlayerPrefs;Authorization;EnvirData;Metrica;Payments;Review"
+        }
+    ],
+    "intPrefs": [
+        {
+            "key": "FirstStartup_YG2",
+            "value": 2
+        }
+    ],
+    "floatPrefs": []
+}
