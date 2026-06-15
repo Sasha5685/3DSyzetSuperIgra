@@ -350,7 +350,7 @@ Camera:
     width: 1
     height: 1
   near clip plane: 0.15
-  far clip plane: 175
+  far clip plane: 200
   field of view: 60
   orthographic: 0
   orthographic size: 5
@@ -1034,15 +1034,15 @@ MonoBehaviour:
       m_Calls: []
   m_text: 
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 28c8fbb8d91ba174492f558077c7c5ea, type: 2}
+  m_sharedMaterial: {fileID: 2180264, guid: 28c8fbb8d91ba174492f558077c7c5ea, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
     rgba: 4278519045
-  m_fontColor: {r: 0.01886791, g: 0.01886791, b: 0.01886791, a: 1}
+  m_fontColor: {r: 1, g: 1, b: 1, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
@@ -1929,8 +1929,8 @@ CharacterController:
   serializedVersion: 3
   m_Height: 2
   m_Radius: 0.5
-  m_SlopeLimit: 65
-  m_StepOffset: 0.5
+  m_SlopeLimit: 50
+  m_StepOffset: 0.4
   m_SkinWidth: 0.08
   m_MinMoveDistance: 0.001
   m_Center: {x: 0, y: 0, z: 0}
@@ -2103,6 +2103,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3531923551912262334}
+  - component: {fileID: 6750388430018288296}
   m_Layer: 0
   m_Name: GameDeffoulted
   m_TagString: Untagged
@@ -2127,6 +2128,21 @@ Transform:
   - {fileID: 15559579883329442}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &6750388430018288296
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6764527602760906587}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 494adc1571914ef49a62b0ea0d29fba1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  checkInterval: 0.3
+  outlineDistance: 4
+  hideDistance: 75
 --- !u!1 &7525752998863227112
 GameObject:
   m_ObjectHideFlags: 0
@@ -2650,15 +2666,15 @@ MonoBehaviour:
       m_Calls: []
   m_text: 
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 28c8fbb8d91ba174492f558077c7c5ea, type: 2}
+  m_sharedMaterial: {fileID: 2180264, guid: 28c8fbb8d91ba174492f558077c7c5ea, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
     rgba: 4278519045
-  m_fontColor: {r: 0.01886791, g: 0.01886791, b: 0.01886791, a: 1}
+  m_fontColor: {r: 1, g: 1, b: 1, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
@@ -2955,15 +2971,15 @@ MonoBehaviour:
       m_Calls: []
   m_text: 
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 28c8fbb8d91ba174492f558077c7c5ea, type: 2}
+  m_sharedMaterial: {fileID: 2180264, guid: 28c8fbb8d91ba174492f558077c7c5ea, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
     rgba: 4278519045
-  m_fontColor: {r: 0.01886791, g: 0.01886791, b: 0.01886791, a: 1}
+  m_fontColor: {r: 1, g: 1, b: 1, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
@@ -3157,15 +3173,15 @@ MonoBehaviour:
       m_Calls: []
   m_text: 
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 28c8fbb8d91ba174492f558077c7c5ea, type: 2}
+  m_sharedMaterial: {fileID: 2180264, guid: 28c8fbb8d91ba174492f558077c7c5ea, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
     rgba: 4278519045
-  m_fontColor: {r: 0.01886791, g: 0.01886791, b: 0.01886791, a: 1}
+  m_fontColor: {r: 1, g: 1, b: 1, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
