@@ -38,7 +38,7 @@ public class Slot : MonoBehaviour, IPointerClickHandler
         }
     }
     
-    public void SetItem(BaseItem  newItem) // Обновите существующий метод
+    public void SetItem(BaseItem  newItem, string Lang) // Обновите существующий метод
     {
         Item = newItem;
         
@@ -58,7 +58,7 @@ public class Slot : MonoBehaviour, IPointerClickHandler
         
         if (UIName != null && newItem.itemName != null)
         {
-            UIName.text = newItem.itemName.GetString("Russian");
+            UIName.text = newItem.itemName.GetString(Lang);
         }
     }
     

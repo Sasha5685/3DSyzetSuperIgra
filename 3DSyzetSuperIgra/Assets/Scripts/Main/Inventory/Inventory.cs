@@ -7,7 +7,7 @@ public class Inventory : MonoBehaviour
     public Slot[] SlotsInventory;
     public Slot UseSlot;
     public HandItem handItem;
-    
+    public static Inventory instatiate;
     [Header("Throw Settings")]
     public float throwForce = 10f;
     public float throwUpwardForce = 5f;
@@ -19,8 +19,12 @@ public class Inventory : MonoBehaviour
     [SerializeField] private AudioClip pickupSound;
         [SerializeField] private AudioClip KickSound;
     [SerializeField] [Range(0f, 1f)] private float pickupVolume = 0.7f;
+
+    public GameManager GameManager;
     void Start()
     {
+        GameManager = GameManager.instatiate;
+        instatiate = this;
         StartCoroutine(InitializeInventory());
     }
     
@@ -136,7 +140,7 @@ public class Inventory : MonoBehaviour
         rb.AddTorque(Random.insideUnitSphere * 5f, ForceMode.Impulse);
         
         // Очищаем слот
-        currentSlot.SetItem(null);
+        currentSlot.SetItem(null, null);
         
         // Убираем модель из рук
         if (handItem != null && handItem.GetCurrentItem() == itemToThrow)
@@ -225,19 +229,14 @@ public class Inventory : MonoBehaviour
             return;
         }
         
-        // Снимаем выделение со всех слотов
-        if (SlotsInventory != null)
+        foreach (var s in SlotsInventory)
         {
-            foreach (var s in SlotsInventory)
+            if (s != null)
             {
-                if (s != null)
-                {
-                    s.SetSelected(false);
-                }
+                s.SetSelected(false);
             }
         }
         
-        // Находим индекс выбранного слота
         for (int i = 0; i < SlotsInventory.Length; i++)
         {
             if (SlotsInventory[i] == slot)
@@ -247,16 +246,14 @@ public class Inventory : MonoBehaviour
             }
         }
         
-        // Выделяем выбранный слот
         slot.SetSelected(true);
         UseSlot = slot;
         
-        // Показываем модель предмета в руках
         if (handItem != null)
         {
             if (slot.Item != null)
             {
-                handItem.ShowItem(slot.Item);
+                handItem.ShowItem(slot.Item);  // ЭТО УЖЕ ДОЛЖНО БЫТЬ
             }
             else
             {
@@ -275,20 +272,51 @@ public class Inventory : MonoBehaviour
         return null;
     }
     
-    public void AddItem(BaseItem  NewItem)
+    public void AddItem(BaseItem NewItem)
     {
         if (SlotsInventory == null) return;
+        if(NewItem.itemName.GetString("en") == "Tire iron")
+        {
+        InvokeManager.instatiate.SendMessageEvent("PickCrowBar");
+        }
         PlayPickupSound();
+        
         for (int i = 0; i < SlotsInventory.Length; i++)
         {
             if (SlotsInventory[i] != null && SlotsInventory[i].IsEmpety())
             {
-                SlotsInventory[i].SetItem(NewItem);
+                SlotsInventory[i].SetItem(NewItem, GameManager.Lang);
+                
+                // ВОТ ТУТ ВАЖНО: проверяем, является ли этот слот ВЫБРАННЫМ
+                Slot currentSlot = GetCurrentSelectedSlot();
+                if (currentSlot != null && currentSlot == SlotsInventory[i])
+                {
+                    // Если да — показываем предмет в руках
+                    if (handItem != null)
+                    {
+                        handItem.ShowItem(NewItem);
+                    }
+                }
                 return;
             }
         }
         
         Debug.LogWarning("Нет свободных слотов для добавления предмета");
+    }
+    public void RefreshCurrentSlot()
+    {
+        Slot currentSlot = GetCurrentSelectedSlot();
+        if (currentSlot != null && handItem != null)
+        {
+            if (currentSlot.Item != null)
+            {
+                handItem.ShowItem(currentSlot.Item);
+            }
+            else
+            {
+                handItem.ClearCurrentItem();
+            }
+        }
     }
     private void PlayPickupSound()
     {

@@ -2,6 +2,7 @@ using UnityEngine;
 
 public class HandItem : MonoBehaviour
 {
+    public static HandItem instatiate;
     [Header("Camera Settings")]
     public Camera handCamera; 
     
@@ -16,20 +17,20 @@ public class HandItem : MonoBehaviour
     
     private void Start()
     {
+        instatiate = this;
         handCamera.enabled = true;
         handCamera.depth = 1;
     }
     
-    public void ShowItem(BaseItem  item)
+    public void ShowItem(BaseItem item)
     {
         ClearCurrentItem();
         if (item == null || item.itemModel == null){return;}
         currentItem = item;
         
-        // Создаем новую модель
         currentItemModel = Instantiate(item.itemModel, itemHolder);
-        currentItemModel.transform.localPosition = Vector3.zero;
-        currentItemModel.transform.localRotation = Quaternion.identity;
+        currentItemModel.transform.localPosition = defaultPosition;  // ИЗМЕНИТЬ: было Vector3.zero
+        currentItemModel.transform.localRotation = Quaternion.Euler(defaultRotation);  // ИЗМЕНИТЬ: было Quaternion.identity
         currentItemModel.transform.localScale = defaultScale;
     }
     

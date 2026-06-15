@@ -58,6 +58,11 @@ public class CarController : MonoBehaviour, Entety
     private float enterTime;
     private VisibleObject visibleObject;
     private AudioSource audioSource; // Для звуков входа/выхода
+
+
+    public GameObject TextHelp;
+
+    public GameObject SmallCursor;
     
     private void Awake()
     {
@@ -175,8 +180,11 @@ public class CarController : MonoBehaviour, Entety
     {
         if (driving)
             return;
+            SmallCursor.SetActive(false);
+        TextHelp.SetActive(true);
+                InvokeManager.instatiate.SendMessageEvent("GetInCar");
         enterTime = Time.time;
-        
+        HandItem.instatiate.itemHolder.gameObject.SetActive(false);
         // Проигрываем звук входа
         PlayEnterSound();
         
@@ -230,7 +238,9 @@ public class CarController : MonoBehaviour, Entety
     {
         if (!driving)
             return;
-        
+                        SmallCursor.SetActive(true);
+                    TextHelp.SetActive(false);
+        HandItem.instatiate.itemHolder.gameObject.SetActive(true);
         // Останавливаем звук двигателя
         StopEngineSound();
         
@@ -379,7 +389,6 @@ public class CarController : MonoBehaviour, Entety
     {
         if (driving)
             return;
-
         EnterCar(
             GameObject.FindGameObjectWithTag("Player")
         );

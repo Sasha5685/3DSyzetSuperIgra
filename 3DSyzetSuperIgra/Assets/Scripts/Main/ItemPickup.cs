@@ -1,3 +1,4 @@
+using System.Runtime.Serialization.Formatters;
 using UnityEngine;
 
 public class ItemPickup : MonoBehaviour
@@ -56,7 +57,10 @@ public class ItemPickup : MonoBehaviour
     {
         if (currentItemInRange == newObject) return;
         
-        currentPickupable?.StopPointing();
+        if (currentPickupable != null && currentPickupable != null)
+        {
+            currentPickupable.StopPointing();
+        }
         currentItemInRange = newObject;
         currentPickupable = newEntety;
         currentPickupable?.Pointing();
@@ -89,6 +93,14 @@ public class ItemPickup : MonoBehaviour
             return;
         }
         
+        Person Person = currentItemInRange.GetComponent<Person>();
+        if (Person != null)
+        {
+            Person.Interact();
+            return;
+        }
+
+
         // Поднятие предмета
         Entety entety = currentPickupable;
         if (entety != null)
