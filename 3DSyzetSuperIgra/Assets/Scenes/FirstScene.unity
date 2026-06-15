@@ -3605,12 +3605,27 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e38a6ca14146e364da883cc47fb948ef, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  DialogsList: {fileID: 11400000, guid: 89ac94d430457694ea7746479db0c13d, type: 2}
+  DialogsList: {fileID: 11400000, guid: f100d78407de8bb4d9eef7631e461325, type: 2}
   PrefabTextMeshPro: {fileID: 6333052441679753086, guid: 4b4a2d5e256e5d14d8c0d7b0f5e09a45, type: 3}
   PersonSpawnPoints:
   - {fileID: 168395436}
   TextSpawnPoints:
   - {fileID: 77594921}
+  NextDialogAction:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 0}
+        m_TargetAssemblyTypeName: 
+        m_MethodName: 
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: 
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!4 &97084461
 Transform:
   m_ObjectHideFlags: 0

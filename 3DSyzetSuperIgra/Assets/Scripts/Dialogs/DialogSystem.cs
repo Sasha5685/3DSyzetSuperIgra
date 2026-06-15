@@ -1,6 +1,4 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
+using UnityEngine.Events;
 using TMPro;
 using UnityEngine;
 
@@ -11,9 +9,10 @@ public class DialogSystem : MonoBehaviour
     private int IdDialog;
     private Dialog ThisDialog;
     
-    [Header("Точки спавна на сцене (перетащите объекты)")]
-    [SerializeField] private Transform[] PersonSpawnPoints;  // Массив точек для персонажей
-    [SerializeField] private Transform[] TextSpawnPoints;    // Массив точек для текста
+    [Header("Точки спавна на сцене")]
+    [SerializeField] private Transform[] PersonSpawnPoints;
+    [SerializeField] private Transform[] TextSpawnPoints;    
+    [SerializeField] private UnityEvent NextDialogAction;
     //Объекты на сцене
     private GameObject PersonDialog;
     private GameObject TextMeshProDialog;
@@ -46,21 +45,6 @@ public class DialogSystem : MonoBehaviour
         Destroy(TextMeshProDialog);
     }
 }
-[Serializable]
-public class Dialog
-{
-    public int IDDialog;
-    [TextArea(2, 5)]public string Message;
-    public AudioClip AudioClip;
-    public Animation SetAnimation;
-    public GameObject PrefabPerson;
 
-    public Action NextDialogAction;
 
-}
-[CreateAssetMenu(fileName = "DialogList", menuName = "Super3DGame/Dialog/NewDialogList")]
-public class DialogsList: ScriptableObject
-{
-    public List<Dialog> FullDialogsList = new List<Dialog>();
-}
 
