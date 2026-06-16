@@ -313,7 +313,7 @@ Transform:
   m_GameObject: {fileID: 2231910971939595991}
   serializedVersion: 2
   m_LocalRotation: {x: -7.9580786e-13, y: 0, z: -0, w: 1}
-  m_LocalPosition: {x: -0, y: 0.2999013, z: -4.092726e-14}
+  m_LocalPosition: {x: 0, y: 0.2999013, z: -4.092726e-14}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -367,7 +367,10 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 625251189868917522}
-  m_Layer: 0
+  - component: {fileID: 4358512976722989944}
+  - component: {fileID: 6517830463007196591}
+  - component: {fileID: 6699622741263897264}
+  m_Layer: 7
   m_Name: BaldiObject
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -390,6 +393,66 @@ Transform:
   - {fileID: 654484931112029888}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &4358512976722989944
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2446768319233452451}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5fea29bb7c508c244a1f805a5fd3fc4d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  outlineMode: 0
+  outlineColor: {r: 1, g: 1, b: 1, a: 1}
+  outlineWidth: 2
+  precomputeOutline: 0
+  bakeKeys: []
+  bakeValues: []
+--- !u!114 &6517830463007196591
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2446768319233452451}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d51b91cf1f385b84c98cb1aef80675a1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  defaultOutlineWidth: 3
+  defaultColor: {r: 0.43867922, g: 0.70300496, b: 1, a: 0.5803922}
+  highlightOutlineWidth: 6
+  highlightColor: {r: 0.091313645, g: 0.38768253, b: 0.7169812, a: 0.78039217}
+  highlightAnimationSpeed: 11
+  enablePulseEffect: 1
+  pulseSpeed: 4
+  pulseAmplitude: 3
+  ClickPerson: ClickToPersonBaldi
+--- !u!65 &6699622741263897264
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2446768319233452451}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 0.32399544, y: 1.9311675, z: 0.12642978}
+  m_Center: {x: 0.01280041, y: 0.92953354, z: -0.0085283145}
 --- !u!1 &2549770651170256061
 GameObject:
   m_ObjectHideFlags: 0

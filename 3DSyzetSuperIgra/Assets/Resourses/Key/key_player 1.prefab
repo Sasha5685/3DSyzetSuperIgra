@@ -9,7 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1060555884902915133}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: key_player 1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -43,7 +43,7 @@ GameObject:
   - component: {fileID: 6951357168293658080}
   - component: {fileID: 6387528426571508124}
   - component: {fileID: 5452749162121775057}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: key_player.001
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -58,13 +58,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7642105354163659745}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalRotation: {x: 0.15755853, y: 0.20533475, z: 0.5880176, w: 0.76632124}
+  m_LocalPosition: {x: -0.17044792, y: 0, z: -1.0144615}
+  m_LocalScale: {x: 1.8132, y: 1.8132, z: 1.8132}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1060555884902915133}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 30, z: 75}
 --- !u!33 &6387528426571508124
 MeshFilter:
   m_ObjectHideFlags: 0

@@ -13,9 +13,8 @@ MonoBehaviour:
   m_Name: Crowbar
   m_EditorClassIdentifier: Assembly-CSharp::KeyItem
   itemName:
-    english: Crowbar
+    english: Tire iron
     russian: "\u041C\u043E\u043D\u0442\u0438\u0440\u043E\u0432\u043A\u0430"
-    turkish: 
   itemIcon: {fileID: 21300000, guid: 2134cde7f4a0ad14e9bc4f6b9a8a8809, type: 3}
   itemPrefab: {fileID: 7037774076862404855, guid: de958e5e8a170a244882c2ed2384dcd9, type: 3}
   itemModel: {fileID: 7037774076862404855, guid: 425762ba278e56f4dbdf29f9bcd17dab, type: 3}

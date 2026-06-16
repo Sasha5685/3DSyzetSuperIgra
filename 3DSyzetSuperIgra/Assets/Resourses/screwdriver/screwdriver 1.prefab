@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 652066101370796143}
   - component: {fileID: 4190552718348068688}
   - component: {fileID: 4655351496730504505}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Cylinder.002
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -27,11 +27,11 @@ Transform:
   m_GameObject: {fileID: 3734596774448065152}
   serializedVersion: 2
   m_LocalRotation: {x: 0.5, y: 0.5, z: -0.5, w: -0.49999997}
-  m_LocalPosition: {x: -0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 100, y: 100, z: 100}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 8379164870289398913}
+  m_Father: {fileID: 5888823547739041485}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!33 &4190552718348068688
 MeshFilter:
@@ -94,7 +94,7 @@ GameObject:
   - component: {fileID: 7199755946799176617}
   - component: {fileID: 7581047860205940526}
   - component: {fileID: 7695652202157902276}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Cylinder
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -110,11 +110,11 @@ Transform:
   m_GameObject: {fileID: 4070687773897977635}
   serializedVersion: 2
   m_LocalRotation: {x: 0.5, y: 0.5, z: -0.5, w: -0.49999997}
-  m_LocalPosition: {x: -0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 100, y: 100, z: 100}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 8379164870289398913}
+  m_Father: {fileID: 5888823547739041485}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!33 &7581047860205940526
 MeshFilter:
@@ -166,6 +166,41 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!1 &4637300042943450157
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 5888823547739041485}
+  m_Layer: 0
+  m_Name: Sp
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &5888823547739041485
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4637300042943450157}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0.19625121, y: 0.7876734, z: -0.14122987, w: 0.5666659}
+  m_LocalPosition: {x: -0.76, y: 0.22, z: -1.1}
+  m_LocalScale: {x: 2.97468, y: 2.97468, z: 2.97468}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 276138023556001072}
+  - {fileID: 7199755946799176617}
+  - {fileID: 9074892743064782221}
+  - {fileID: 652066101370796143}
+  m_Father: {fileID: 8379164870289398913}
+  m_LocalEulerAnglesHint: {x: 0.004, y: 108.535, z: -27.984}
 --- !u!1 &4786979745698808712
 GameObject:
   m_ObjectHideFlags: 0
@@ -177,7 +212,7 @@ GameObject:
   - component: {fileID: 276138023556001072}
   - component: {fileID: 8608492812265889215}
   - component: {fileID: 8481001574629753684}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Cube
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -192,12 +227,12 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4786979745698808712}
   serializedVersion: 2
-  m_LocalRotation: {x: -0.7071068, y: 0, z: -0, w: 0.7071067}
-  m_LocalPosition: {x: 0.22842881, y: -2.3903948e-10, z: 2.3903948e-10}
+  m_LocalRotation: {x: -0.7071068, y: -0, z: -0, w: 0.7071067}
+  m_LocalPosition: {x: 0.22842881, y: 0, z: 0}
   m_LocalScale: {x: 113.99977, y: 113.99977, z: 113.99977}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 8379164870289398913}
+  m_Father: {fileID: 5888823547739041485}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!33 &8608492812265889215
 MeshFilter:
@@ -258,7 +293,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8379164870289398913}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: screwdriver 1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -278,10 +313,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 276138023556001072}
-  - {fileID: 7199755946799176617}
-  - {fileID: 9074892743064782221}
-  - {fileID: 652066101370796143}
+  - {fileID: 5888823547739041485}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &6031395912572625383
@@ -295,7 +327,7 @@ GameObject:
   - component: {fileID: 9074892743064782221}
   - component: {fileID: 4057320344728669420}
   - component: {fileID: 2412820323619372803}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Cylinder.001
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -311,11 +343,11 @@ Transform:
   m_GameObject: {fileID: 6031395912572625383}
   serializedVersion: 2
   m_LocalRotation: {x: 0.000000015454313, y: -0.70710677, z: 0.000000015454312, w: 0.7071068}
-  m_LocalPosition: {x: -0.32581994, y: -0.000000007102887, z: 5.4637594e-10}
+  m_LocalPosition: {x: -0.32581994, y: 0, z: 0}
   m_LocalScale: {x: 100, y: 100, z: 100}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 8379164870289398913}
+  m_Father: {fileID: 5888823547739041485}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!33 &4057320344728669420
 MeshFilter:

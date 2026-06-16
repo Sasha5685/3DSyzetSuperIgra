@@ -5,9 +5,9 @@ using UnityEngine;
 public class Dialog
 {
     public int IDDialog;
-    [TextArea(2, 5)]public string Message;
-    public AudioClip AudioClip;
-    public Animation SetAnimation;
+    public FieldLocalize Message;
+    public SoundLocalize AudioClip;
+    public AnimationClip  SetAnimation;
     public GameObject PrefabPerson;
 
 }

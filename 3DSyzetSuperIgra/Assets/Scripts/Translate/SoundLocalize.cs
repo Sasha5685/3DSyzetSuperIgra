@@ -1,12 +1,12 @@
 using System;
 using UnityEngine;
 [Serializable]
-public class FieldLocalize 
+public class SoundLocalize 
 {
-    [SerializeField] private string english;
-    [SerializeField] private string russian;
+    [SerializeField] private AudioClip english;
+    [SerializeField] private AudioClip russian;
     
-    public string GetString(string lang)
+    public AudioClip GetAudio(string lang)
     {
         switch (lang)
         {
