@@ -370,6 +370,7 @@ GameObject:
   - component: {fileID: 4358512976722989944}
   - component: {fileID: 6517830463007196591}
   - component: {fileID: 6699622741263897264}
+  - component: {fileID: 813354813822409971}
   m_Layer: 7
   m_Name: BaldiObject
   m_TagString: Untagged
@@ -453,6 +454,21 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 0.32399544, y: 1.9311675, z: 0.12642978}
   m_Center: {x: 0.01280041, y: 0.92953354, z: -0.0085283145}
+--- !u!114 &813354813822409971
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2446768319233452451}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d7bc5f8d46892ff4f8ec3b50156d3f58, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  includeChildren: 1
+  extendedOutlineRange: 1
+  extendedRangeMultiplier: 4
 --- !u!1 &2549770651170256061
 GameObject:
   m_ObjectHideFlags: 0

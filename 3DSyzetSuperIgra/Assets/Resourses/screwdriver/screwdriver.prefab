@@ -262,7 +262,6 @@ GameObject:
   - component: {fileID: 1339720311111900737}
   - component: {fileID: 5040939399719874928}
   - component: {fileID: 2418107202495534230}
-  - component: {fileID: 867747090389447393}
   m_Layer: 7
   m_Name: screwdriver
   m_TagString: Untagged
@@ -329,7 +328,7 @@ BoxCollider:
     m_Bits: 0
   m_ExcludeLayers:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 64
   m_LayerOverridePriority: 0
   m_IsTrigger: 0
   m_ProvidesContacts: 0
@@ -376,19 +375,6 @@ MonoBehaviour:
   enablePulseEffect: 1
   pulseSpeed: 4
   pulseAmplitude: 3
---- !u!114 &867747090389447393
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5808738371738980661}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d7bc5f8d46892ff4f8ec3b50156d3f58, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  includeChildren: 1
 --- !u!1 &6031395912572625383
 GameObject:
   m_ObjectHideFlags: 0

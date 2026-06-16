@@ -4,7 +4,7 @@ using System.Collections;
 
 public class ItemPickupable : MonoBehaviour, Entety
 {   
-    [SerializeField] private BaseItem  itemData; // ОДНО поле для ЛЮБОГО предмета
+    [SerializeField] private BaseItem itemData;
     
     [Header("Default Outline")]
     [SerializeField] private float defaultOutlineWidth = 0.15f;
@@ -45,7 +45,7 @@ public class ItemPickupable : MonoBehaviour, Entety
         
         outlineComponent.OutlineColor = defaultColor;
         outlineComponent.OutlineWidth = defaultOutlineWidth;
-        outlineComponent.enabled = true;
+        outlineComponent.enabled = false; // ← ИЗМЕНЕНО: ВЫКЛЮЧЕН ПО УМОЛЧАНИЮ
         
         currentWidth = defaultOutlineWidth;
         currentColor = defaultColor;
@@ -58,6 +58,7 @@ public class ItemPickupable : MonoBehaviour, Entety
         isHighlighted = true;
         targetWidth = highlightOutlineWidth;
         targetColor = highlightColor;
+        outlineComponent.enabled = true; // ← ДОБАВЛЕНО: ВКЛЮЧАЕМ ПРИ НАВЕДЕНИИ
         
         if (animationCoroutine != null)
             StopCoroutine(animationCoroutine);
@@ -70,6 +71,7 @@ public class ItemPickupable : MonoBehaviour, Entety
         targetWidth = defaultOutlineWidth;
         targetColor = defaultColor;
         pulseTimer = 0f;
+        outlineComponent.enabled = false; // ← ДОБАВЛЕНО: ВЫКЛЮЧАЕМ КОГДА ОТВЕЛИ ВЗГЛЯД
         
         if (animationCoroutine != null)
             StopCoroutine(animationCoroutine);
@@ -89,20 +91,18 @@ public class ItemPickupable : MonoBehaviour, Entety
             elapsedTime += Time.deltaTime;
             float t = elapsedTime / animationDuration;
             
-            // Плавный lerp к целевым значениям
             currentWidth = Mathf.Lerp(startWidth, targetWidth, t);
             currentColor = Color.Lerp(startColor, targetColor, t);
             
-            // Добавляем пульсацию если выделен
             float finalWidth = currentWidth;
-            if (isHighlighted && enablePulseEffect)
+            if (isHighlighted && enablePulseEffect && outlineComponent.enabled) // ← ДОБАВЛЕНА ПРОВЕРКА
             {
                 pulseTimer += Time.deltaTime * pulseSpeed;
                 float pulse = Mathf.Sin(pulseTimer) * pulseAmplitude;
                 finalWidth += pulse;
             }
             
-            if (outlineComponent != null)
+            if (outlineComponent != null && outlineComponent.enabled) // ← ДОБАВЛЕНА ПРОВЕРКА
             {
                 outlineComponent.OutlineWidth = finalWidth;
                 outlineComponent.OutlineColor = currentColor;
@@ -111,17 +111,15 @@ public class ItemPickupable : MonoBehaviour, Entety
             yield return null;
         }
         
-        // Финальные значения
         currentWidth = targetWidth;
         currentColor = targetColor;
         
-        if (outlineComponent != null)
+        if (outlineComponent != null && outlineComponent.enabled) // ← ДОБАВЛЕНА ПРОВЕРКА
         {
             outlineComponent.OutlineWidth = targetWidth;
             outlineComponent.OutlineColor = targetColor;
         }
         
-        // Если нужна постоянная пульсация, запускаем её отдельно
         if (isHighlighted && enablePulseEffect)
         {
             animationCoroutine = StartCoroutine(PulseCoroutine());
@@ -134,7 +132,7 @@ public class ItemPickupable : MonoBehaviour, Entety
     
     private IEnumerator PulseCoroutine()
     {
-        while (isHighlighted && enablePulseEffect && outlineComponent != null)
+        while (isHighlighted && enablePulseEffect && outlineComponent != null && outlineComponent.enabled) // ← ДОБАВЛЕНА ПРОВЕРКА
         {
             pulseTimer += Time.deltaTime * pulseSpeed;
             float pulse = Mathf.Sin(pulseTimer) * pulseAmplitude;
@@ -153,10 +151,9 @@ public class ItemPickupable : MonoBehaviour, Entety
         Pointing();
     }
     
-    public BaseItem  ReturnItem()
+    public BaseItem ReturnItem()
     {
         return itemData;
-    
     }
     
     void OnDestroy()

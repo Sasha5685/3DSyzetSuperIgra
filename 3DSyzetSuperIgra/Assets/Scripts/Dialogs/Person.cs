@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Person : MonoBehaviour, Entety
+public class Person : MonoBehaviour, Entety, IInteractable
 {
     [Header("Default Outline")]
     [SerializeField] private float defaultOutlineWidth = 0.15f;

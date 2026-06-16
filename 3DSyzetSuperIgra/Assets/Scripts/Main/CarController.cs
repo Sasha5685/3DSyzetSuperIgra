@@ -4,7 +4,7 @@ using UnityEngine;
 [RequireComponent(typeof(Rigidbody))]
 [RequireComponent(typeof(RearWheelDrive))]
 [RequireComponent(typeof(Outline))]
-public class CarController : MonoBehaviour, Entety
+public class CarController : MonoBehaviour, Entety, IInteractable
 {
     [Header("Player")]
     [SerializeField] private Transform exitPoint;
@@ -389,9 +389,10 @@ public class CarController : MonoBehaviour, Entety
     {
         if (driving)
             return;
-        EnterCar(
-            GameObject.FindGameObjectWithTag("Player")
-        );
+        if(Inventory.instatiate.HandItem("Car key"))
+            EnterCar(
+                GameObject.FindGameObjectWithTag("Player")
+            );
     }
 
     #endregion

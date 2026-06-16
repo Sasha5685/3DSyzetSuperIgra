@@ -16,13 +16,36 @@ public class InvokeManager : MonoBehaviour
     public GameObject[] ArrowObjects;
     public GameObject Arrow;
     private bool isStartDelayed = false;
+    private const float HighlightCheckInterval = 1f;
+    private float lastCheckTime;
+
+    private Inventory Inventory;
     private void Start()
     {
         instatiate = this;
         GameManager = GameManager.instatiate;
         LoadIdHistory();
         StartCoroutine(DelayedStart());
+        Inventory = Inventory.instatiate;
 
+    }
+    private void Update()
+    {
+        if (Time.time - lastCheckTime > HighlightCheckInterval)
+        {
+            lastCheckTime = Time.time;
+            CheckMes();
+        }
+    }
+    private void CheckMes()
+    {
+        if(IdHistory == 1)
+        {
+            if (Inventory.instatiate.HandItem("Car key") && Inventory.instatiate.HandItem("Tire iron"))
+            {
+                IdHistory++;NextHistoryMoment();
+            }
+        }
     }
     private IEnumerator DelayedStart()
     {
@@ -50,7 +73,11 @@ public class InvokeManager : MonoBehaviour
         }
         else if(Event == "PickCrowBar")
         {
-            if(IdHistory == 1){IdHistory++;NextHistoryMoment();}
+            if(IdHistory == 1){ Arrow.SetActive(false);}
+        }
+        else if(Event == "PickCarKey")
+        {
+            if(IdHistory == 2){IdHistory++;NextHistoryMoment();}
         }
         else if(Event == "GetInCar")
         {

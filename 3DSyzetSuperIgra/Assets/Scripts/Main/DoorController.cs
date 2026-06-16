@@ -1,7 +1,7 @@
 using UnityEngine;
 using System.Collections;
 
-public class DoorController : MonoBehaviour, Entety
+public class DoorController : MonoBehaviour, Entety, IInteractable
 {
     [Header("Door Settings")]
     [SerializeField] private Animator doorAnimator;
@@ -13,36 +13,26 @@ public class DoorController : MonoBehaviour, Entety
     [Header("Audio Settings")]
     [SerializeField] private AudioSource audioSource;
     [SerializeField] private AudioClip openSound;
-        [SerializeField] private AudioClip RepitOpenDoorSound;
+    [SerializeField] private AudioClip RepitOpenDoorSound;
     [SerializeField] private AudioClip closeSound;
     [SerializeField] private float soundVolume = 1f;
     
     [Header("Collider Settings")]
     [SerializeField] private Collider doorCollider;
     [SerializeField] private LayerMask playerLayer;
-    
-    [Header("Outline Settings")]
+
+    [Header("Outline")]
     [SerializeField] private float defaultOutlineWidth = 0.15f;
     [SerializeField] private Color defaultColor = new Color(1f, 1f, 1f, 0.5f);
-    
-    [Header("Highlight Outline")]
     [SerializeField] private float highlightOutlineWidth = 0.6f;
     [SerializeField] private Color highlightColor = Color.yellow;
-    [SerializeField] private float highlightAnimationSpeed = 8f;
-    
-    [Header("Pulse Effect")]
-    [SerializeField] private bool enablePulseEffect = true;
     [SerializeField] private float pulseSpeed = 2f;
     [SerializeField] private float pulseAmplitude = 0.2f;
     
     private Outline outlineComponent;
-    private float targetWidth;
-    private Color targetColor;
-    private float currentWidth;
-    private Color currentColor;
     private bool isHighlighted = false;
     private float pulseTimer = 0f;
-    private Coroutine animationCoroutine;
+    private Coroutine pulseCoroutine;
     private bool isAnimating = false;
     private bool playerLayerWasExcluded = false;
     public bool LockDoor;
@@ -55,13 +45,23 @@ public class DoorController : MonoBehaviour, Entety
         SetupCollider();
     }
     
+    private void SetupOutline()
+    {
+        outlineComponent = GetComponent<Outline>();
+        if (outlineComponent == null)
+        {
+            outlineComponent = gameObject.AddComponent<Outline>();
+        }
+        outlineComponent.OutlineColor = defaultColor;
+        outlineComponent.OutlineWidth = defaultOutlineWidth;
+        outlineComponent.enabled = false;
+    }
+    
     void Start()
     {
-        // Останавливаем автоматическое проигрывание анимации
         if (doorAnimator != null)
         {
             doorAnimator.enabled = true;
-            // Принудительно устанавливаем состояние без проигрывания анимации
             if (isOpen)
             {
                 doorAnimator.Play("DoorOpen", 0, 1f);
@@ -73,28 +73,8 @@ public class DoorController : MonoBehaviour, Entety
                 ExcludePlayerLayer(false);
             }
             doorAnimator.Update(0f);
-            // Отключаем animator чтобы он не перезаписал состояние
             doorAnimator.enabled = false;
         }
-    }
-    
-    private void SetupOutline()
-    {
-        outlineComponent = GetComponent<Outline>();
-        
-        if (outlineComponent == null)
-        {
-            outlineComponent = gameObject.AddComponent<Outline>();
-        }
-        
-        outlineComponent.OutlineColor = defaultColor;
-        outlineComponent.OutlineWidth = defaultOutlineWidth;
-        outlineComponent.enabled = true;
-        
-        currentWidth = defaultOutlineWidth;
-        currentColor = defaultColor;
-        targetWidth = defaultOutlineWidth;
-        targetColor = defaultColor;
     }
     
     private void SetupAnimator()
@@ -104,13 +84,8 @@ public class DoorController : MonoBehaviour, Entety
             doorAnimator = GetComponent<Animator>();
         }
         
-        if (doorAnimator == null)
+        if (doorAnimator != null)
         {
-            Debug.LogWarning($"DoorController on {gameObject.name} has no Animator component!");
-        }
-        else
-        {
-            // Включаем animator только когда нужно
             doorAnimator.enabled = false;
         }
     }
@@ -151,7 +126,6 @@ public class DoorController : MonoBehaviour, Entety
         
         if (exclude)
         {
-            // Добавляем слой игрока в исключения
             if (!playerLayerWasExcluded)
             {
                 doorCollider.excludeLayers |= playerLayer;
@@ -160,7 +134,6 @@ public class DoorController : MonoBehaviour, Entety
         }
         else
         {
-            // Убираем слой игрока из исключений
             if (playerLayerWasExcluded)
             {
                 doorCollider.excludeLayers &= ~playerLayer;
@@ -179,97 +152,44 @@ public class DoorController : MonoBehaviour, Entety
     
     public void Pointing()
     {
-        if (isHighlighted) return;
+        if (this == null || outlineComponent == null) return;
         
         isHighlighted = true;
-        targetWidth = highlightOutlineWidth;
-        targetColor = highlightColor;
+        outlineComponent.enabled = true;
+        outlineComponent.OutlineWidth = highlightOutlineWidth;
+        outlineComponent.OutlineColor = highlightColor;
         
-        if (animationCoroutine != null)
-            StopCoroutine(animationCoroutine);
-        animationCoroutine = StartCoroutine(AnimateOutline());
+        if (pulseCoroutine != null)
+            StopCoroutine(pulseCoroutine);
+        pulseCoroutine = StartCoroutine(PulseCoroutine());
     }
     
     public void StopPointing()
     {
-        if (!isHighlighted) return;
+        if (this == null || outlineComponent == null) return;
         
         isHighlighted = false;
-        targetWidth = defaultOutlineWidth;
-        targetColor = defaultColor;
         pulseTimer = 0f;
+        outlineComponent.enabled = false;
+        outlineComponent.OutlineWidth = defaultOutlineWidth;
+        outlineComponent.OutlineColor = defaultColor;
         
-        if (animationCoroutine != null)
-            StopCoroutine(animationCoroutine);
-        animationCoroutine = StartCoroutine(AnimateOutline());
-    }
-    
-    private IEnumerator AnimateOutline()
-    {
-        float animationDuration = 1f / highlightAnimationSpeed;
-        float elapsedTime = 0f;
-        
-        float startWidth = currentWidth;
-        Color startColor = currentColor;
-        
-        while (elapsedTime < animationDuration)
+        if (pulseCoroutine != null)
         {
-            elapsedTime += Time.deltaTime;
-            float t = elapsedTime / animationDuration;
-            
-            currentWidth = Mathf.Lerp(startWidth, targetWidth, t);
-            currentColor = Color.Lerp(startColor, targetColor, t);
-            
-            float finalWidth = currentWidth;
-            if (isHighlighted && enablePulseEffect)
-            {
-                pulseTimer += Time.deltaTime * pulseSpeed;
-                float pulse = Mathf.Sin(pulseTimer) * pulseAmplitude;
-                finalWidth += pulse;
-            }
-            
-            if (outlineComponent != null)
-            {
-                outlineComponent.OutlineWidth = finalWidth;
-                outlineComponent.OutlineColor = currentColor;
-            }
-            
-            yield return null;
-        }
-        
-        currentWidth = targetWidth;
-        currentColor = targetColor;
-        
-        if (outlineComponent != null)
-        {
-            outlineComponent.OutlineWidth = targetWidth;
-            outlineComponent.OutlineColor = targetColor;
-        }
-        
-        if (isHighlighted && enablePulseEffect)
-        {
-            animationCoroutine = StartCoroutine(PulseCoroutine());
-        }
-        else
-        {
-            animationCoroutine = null;
+            StopCoroutine(pulseCoroutine);
+            pulseCoroutine = null;
         }
     }
     
     private IEnumerator PulseCoroutine()
     {
-        while (isHighlighted && enablePulseEffect && outlineComponent != null)
+        while (isHighlighted && outlineComponent != null && outlineComponent.enabled)
         {
             pulseTimer += Time.deltaTime * pulseSpeed;
-            float pulse = Mathf.Sin(pulseTimer) * pulseAmplitude;
-            outlineComponent.OutlineWidth = targetWidth + pulse;
+            outlineComponent.OutlineWidth = highlightOutlineWidth + Mathf.Sin(pulseTimer) * pulseAmplitude;
             yield return null;
         }
-        
-        if (outlineComponent != null && !isHighlighted)
-            outlineComponent.OutlineWidth = targetWidth;
-            
-        animationCoroutine = null;
+        pulseCoroutine = null;
     }
     
     public void UseblePointing()
@@ -277,17 +197,15 @@ public class DoorController : MonoBehaviour, Entety
         Pointing();
     }
     
-    public BaseItem  ReturnItem()
+    public BaseItem ReturnItem()
     {
-        Debug.LogWarning("DoorController: ReturnItem called but doors don't return items!");
         return null;
     }
     
     public void Interact()
     {
-        
         if (isAnimating) return;
-        if(LockDoor == true)
+        if (LockDoor)
         {
             RepitOpenDoor();
             return;
@@ -300,6 +218,7 @@ public class DoorController : MonoBehaviour, Entety
         {
             CloseDoor();
         }
+        Debug.Log(1);
     }
     
     private void RepitOpenDoor()
@@ -308,24 +227,17 @@ public class DoorController : MonoBehaviour, Entety
         
         if (doorAnimator != null)
         {
-            // Останавливаем текущую анимацию если есть
             if (isAnimating) return;
             
             isAnimating = true;
-            
-            // Включаем animator
             doorAnimator.enabled = true;
-            
-            // Запускаем анимацию неудачной попытки открытия
             doorAnimator.SetTrigger("RepitOpen");
             
             StartCoroutine(WaitForAnimation(() => {
                 isAnimating = false;
                 
-                // Отключаем animator после анимации
                 if (doorAnimator != null)
                 {
-                    // Возвращаем дверь в исходное состояние
                     if (isOpen)
                         doorAnimator.Play("DoorOpen", 0, 1f);
                     else
@@ -337,20 +249,15 @@ public class DoorController : MonoBehaviour, Entety
             }));
         }
     }
+    
     private void OpenDoor()
     {
-        
-        // СРАЗУ добавляем слой игрока в исключения - игрок может проходить сразу
         ExcludePlayerLayer(true);
-        
-        // Проигрываем звук открытия
         PlaySound(openSound);
         
         if (doorAnimator != null)
         {
             isAnimating = true;
-            
-            // Включаем animator и проигрываем анимацию
             doorAnimator.enabled = true;
             doorAnimator.ResetTrigger(closeTrigger);
             doorAnimator.SetTrigger(openTrigger);
@@ -359,7 +266,6 @@ public class DoorController : MonoBehaviour, Entety
                 isOpen = true;
                 isAnimating = false;
                 
-                // Отключаем animator и фиксируем финальное состояние
                 if (doorAnimator != null)
                 {
                     doorAnimator.Play("DoorOpen", 0, 1f);
@@ -376,19 +282,12 @@ public class DoorController : MonoBehaviour, Entety
     
     private void CloseDoor()
     {
-        Debug.Log($"Closing door {gameObject.name}");
-        
-        // СРАЗУ убираем слой игрока из исключений - игрок не может проходить
         ExcludePlayerLayer(false);
-        
-        // Проигрываем звук закрытия
         PlaySound(closeSound);
         
         if (doorAnimator != null)
         {
             isAnimating = true;
-            
-            // Включаем animator и проигрываем анимацию
             doorAnimator.enabled = true;
             doorAnimator.ResetTrigger(openTrigger);
             doorAnimator.SetTrigger(closeTrigger);
@@ -397,7 +296,6 @@ public class DoorController : MonoBehaviour, Entety
                 isOpen = false;
                 isAnimating = false;
                 
-                // Отключаем animator и фиксируем финальное состояние
                 if (doorAnimator != null)
                 {
                     doorAnimator.Play("DoorClosed", 0, 0f);
@@ -424,9 +322,14 @@ public class DoorController : MonoBehaviour, Entety
         onComplete?.Invoke();
     }
     
-    void OnDestroy()
+    private void OnDestroy()
     {
-        if (animationCoroutine != null && gameObject.activeInHierarchy)
-            StopCoroutine(animationCoroutine);
+        if (pulseCoroutine != null)
+            StopCoroutine(pulseCoroutine);
+        
+        if (outlineComponent != null)
+        {
+            outlineComponent.enabled = false;
+        }
     }
 }

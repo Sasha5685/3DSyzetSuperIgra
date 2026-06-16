@@ -21,10 +21,14 @@ public class Inventory : MonoBehaviour
     [SerializeField] [Range(0f, 1f)] private float pickupVolume = 0.7f;
 
     public GameManager GameManager;
+    void Awake()
+    {
+        instatiate = this;
+    }
     void Start()
     {
         GameManager = GameManager.instatiate;
-        instatiate = this;
+
         StartCoroutine(InitializeInventory());
     }
     
@@ -271,13 +275,24 @@ public class Inventory : MonoBehaviour
         }
         return null;
     }
-    
+    public bool HandItem(string Name)
+    {
+        for (int i = 0; i < SlotsInventory.Length; i++)
+        {            
+            if(SlotsInventory[i].Item == null) continue;
+            if(SlotsInventory[i].Item.itemName.GetString("en") == Name)
+            {
+                return true;
+            }
+        }
+        return false;
+    }
     public void AddItem(BaseItem NewItem)
     {
         if (SlotsInventory == null) return;
         if(NewItem.itemName.GetString("en") == "Tire iron")
         {
-        InvokeManager.instatiate.SendMessageEvent("PickCrowBar");
+            InvokeManager.instatiate.SendMessageEvent("PickCrowBar");
         }
         PlayPickupSound();
         

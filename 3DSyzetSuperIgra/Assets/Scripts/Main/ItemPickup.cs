@@ -1,117 +1,97 @@
-using System.Runtime.Serialization.Formatters;
 using UnityEngine;
 
 public class ItemPickup : MonoBehaviour
 {
-    [Header("Настройки рейкаста")]
-    [SerializeField] private float pickupRadius = 2f;
-    [SerializeField] private float pickupAngle = 360f;
     [SerializeField] private LayerMask itemLayer;
     [SerializeField] private Transform playerCamera;
-    
-    [Header("Настройки поднятия")]
     [SerializeField] private KeyCode pickupKey = KeyCode.E;
     [SerializeField] private float pickupDistance = 3f;
-    
-    [Header("Highlight Settings")]
-    private float highlightCheckInterval = 0.15f;
-    
+    [SerializeField] private Inventory inventory;
+
+    private const float HighlightCheckInterval = 0.15f;
+    private float lastCheckTime;
     private GameObject currentItemInRange;
     private Entety currentPickupable;
-    [SerializeField] private Inventory inventory;
-    
-    private float lastCheckTime;
-    
+    private IInteractable currentInteractable; // см. ниже
+
     private void Update()
     {
-        float currentTime = Time.time;
-        if (currentTime - lastCheckTime > highlightCheckInterval)
+        if (Time.time - lastCheckTime > HighlightCheckInterval)
         {
-            lastCheckTime = currentTime;
+            lastCheckTime = Time.time;
             FindObjectsInRange();
         }
-        
-        if (Input.GetKeyDown(pickupKey) && currentItemInRange)
+
+        if (currentItemInRange != null && Input.GetKeyDown(pickupKey))
         {
             InteractWithObject();
         }
     }
-    
-    private void FindObjectsInRange()
+
+    [SerializeField] private LayerMask obstacleLayer; // стены, пол и т.п.
+
+    private LayerMask combinedMask; // кэшируем один раз
+
+    private void Awake()
     {
-        Ray ray = new Ray(playerCamera.position, playerCamera.forward);
-        
-        GameObject targetObject = null;
-        Entety targetEntety = null;
-        
-        if (Physics.Raycast(ray, out RaycastHit hit, pickupDistance, itemLayer))
-        {
-            targetObject = hit.collider.gameObject;
-            targetEntety = hit.collider.GetComponent<Entety>();
-        }
-        
-        UpdateHighlight(targetObject, targetEntety);
+        combinedMask = itemLayer | obstacleLayer;
     }
-    
-    private void UpdateHighlight(GameObject newObject, Entety newEntety)
+
+private void FindObjectsInRange()
+{
+    if (Physics.Raycast(playerCamera.position, playerCamera.forward,
+            out RaycastHit hit, pickupDistance, combinedMask, QueryTriggerInteraction.Ignore))
+    {
+        bool isItem = (itemLayer.value & (1 << hit.collider.gameObject.layer)) != 0;
+        UpdateHighlight(isItem ? hit.collider.gameObject : null);
+    }
+    else
+    {
+        UpdateHighlight(null);
+    }
+}
+    private void UpdateHighlight(GameObject newObject)
     {
         if (currentItemInRange == newObject) return;
-        
-        if (currentPickupable != null && currentPickupable != null)
-        {
+
+        if (currentPickupable != null && (object)currentPickupable as Object != null)
             currentPickupable.StopPointing();
-        }
+
         currentItemInRange = newObject;
-        currentPickupable = newEntety;
+
+        if (newObject != null)
+        {
+            currentPickupable = newObject.GetComponent<Entety>();
+            currentInteractable = newObject.GetComponent<IInteractable>();
+        }
+        else
+        {
+            currentPickupable = null;
+            currentInteractable = null;
+        }
+
         currentPickupable?.Pointing();
     }
-    
-    // Добавьте этот метод в класс ItemPickup
+
     private void InteractWithObject()
     {
-        if (!currentItemInRange) return;
-
-        // Проверяем, является ли объект машиной
-        CarController car = currentItemInRange.GetComponent<CarController>();
-        if (car != null)
+        if (currentInteractable != null)
         {
-            car.Interact();
+            currentInteractable.Interact();
             return;
         }
 
-        WoodPlanks woodPlanks = currentItemInRange.GetComponent<WoodPlanks>();
-        if (woodPlanks != null)
+        if (currentPickupable != null)
         {
-            woodPlanks.Interact();
-            return;
-        }
-        
-        DoorController door = currentItemInRange.GetComponent<DoorController>();
-        if (door != null)
-        {
-            door.Interact();
-            return;
-        }
-        
-        Person Person = currentItemInRange.GetComponent<Person>();
-        if (Person != null)
-        {
-            Person.Interact();
-            return;
-        }
-
-
-        // Поднятие предмета
-        Entety entety = currentPickupable;
-        if (entety != null)
-        {
-            BaseItem item = entety.ReturnItem();
+            BaseItem item = currentPickupable.ReturnItem();
             if (item != null)
             {
                 inventory.AddItem(item);
-                Destroy(currentItemInRange);
+                GameObject toDestroy = currentItemInRange;
                 currentItemInRange = null;
                 currentPickupable = null;
+                currentInteractable = null;
+                Destroy(toDestroy);
             }
         }
     }
