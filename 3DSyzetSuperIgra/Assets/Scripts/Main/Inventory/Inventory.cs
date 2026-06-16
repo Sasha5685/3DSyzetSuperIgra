@@ -152,7 +152,6 @@ public class Inventory : MonoBehaviour
             handItem.ClearCurrentItem();
         }
         
-        Debug.Log($"Выброшен предмет: {itemToThrow.itemName.GetString("Russian")}");
     }
     
     // Получаем позицию для броска
