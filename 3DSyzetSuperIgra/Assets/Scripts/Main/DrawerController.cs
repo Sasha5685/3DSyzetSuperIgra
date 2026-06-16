@@ -8,6 +8,11 @@ public class DrawerController : MonoBehaviour, Entety, IInteractable
     [SerializeField] private Vector3 openOffset = new Vector3(0, 0, 0.5f);
     [SerializeField] private float animationSpeed = 2f;
 
+    [Header("Тип открывания")]
+    [SerializeField] private bool useRotation = false;          // true = поворот, false = движение
+    [SerializeField] private Vector3 openRotation = new Vector3(0, -90f, 0); // Угол поворота
+    [SerializeField] private Vector3 closedRotation = Vector3.zero;          // Начальный угол
+
     [Header("Outline")]
     [SerializeField] private float defaultOutlineWidth = 0.15f;
     [SerializeField] private Color defaultColor = new Color(1f, 1f, 1f, 0.5f);
@@ -22,18 +27,20 @@ public class DrawerController : MonoBehaviour, Entety, IInteractable
     [SerializeField] private float soundVolume = 0.7f;
 
     private Outline outlineComponent;
-    private Renderer[] cachedRenderers;   // кэш один раз, без повторных GetComponent
-    private bool outlineUsable;           // флаг валидности, проверяется один раз при смене состояния
+    private Renderer[] cachedRenderers;
+    private bool outlineUsable;
 
     private Vector3 closedPosition;
     private Vector3 openPosition;
+    private Quaternion closedRotationQuat;
+    private Quaternion openRotationQuat;
     private bool isHighlighted;
     private bool isAnimating;
     private bool isOpened;
     private AudioSource audioSource;
     private float pulseTimer;
     private Coroutine pulseCoroutine;
-    [SerializeField] private Renderer[] outlineRenderers; // явно назначить в инспекторе только реальные части ящика
+    [SerializeField] private Renderer[] outlineRenderers;
 
     private void CacheRenderers()
     {
@@ -47,7 +54,6 @@ public class DrawerController : MonoBehaviour, Entety, IInteractable
         }
         outlineUsable = cachedRenderers != null && cachedRenderers.Length > 0;
     }
-    private static readonly WaitForEndOfFrame _eof = new WaitForEndOfFrame(); // не используется, но пример паттерна кэширования yield-объектов
 
     private void Awake()
     {
@@ -69,19 +75,19 @@ public class DrawerController : MonoBehaviour, Entety, IInteractable
         {
             closedPosition = drawerTransform.localPosition;
             openPosition = closedPosition + openOffset;
+            closedRotationQuat = Quaternion.Euler(closedRotation);
+            openRotationQuat = Quaternion.Euler(openRotation);
         }
     }
 
-
-    // Дешёвая проверка валидности кэша без аллокаций и без повторного GetComponentsInChildren
     private bool RenderersAlive()
     {
         if (!outlineUsable) return false;
         for (int i = 0; i < cachedRenderers.Length; i++)
         {
-            if (cachedRenderers[i] == null) // Unity null-check, ловит Destroy
+            if (cachedRenderers[i] == null)
             {
-                outlineUsable = false; // инвалидируем один раз, дальше Pointing() будет no-op без повторных проверок массива
+                outlineUsable = false;
                 return false;
             }
         }
@@ -91,7 +97,7 @@ public class DrawerController : MonoBehaviour, Entety, IInteractable
     public void Pointing()
     {
         if (this == null || outlineComponent == null) return;
-        if (!RenderersAlive()) return; // рендерер(ы) уничтожены — безопасно выходим, не трогая Outline.enabled
+        if (!RenderersAlive()) return;
 
         isHighlighted = true;
         outlineComponent.enabled = true;
@@ -151,7 +157,18 @@ public class DrawerController : MonoBehaviour, Entety, IInteractable
         isAnimating = true;
         isOpened = true;
         PlaySound(openSound);
-        StartCoroutine(AnimateDrawer(closedPosition, openPosition));
+
+        if (useRotation)
+        {
+            StartCoroutine(AnimateDrawerWithRotation(
+                closedPosition, openPosition,
+                closedRotationQuat, openRotationQuat
+            ));
+        }
+        else
+        {
+            StartCoroutine(AnimateDrawer(closedPosition, openPosition));
+        }
     }
 
     private void CloseDrawer()
@@ -159,10 +176,20 @@ public class DrawerController : MonoBehaviour, Entety, IInteractable
         isAnimating = true;
         isOpened = false;
         PlaySound(closeSound);
-        StartCoroutine(AnimateDrawer(openPosition, closedPosition));
+
+        if (useRotation)
+        {
+            StartCoroutine(AnimateDrawerWithRotation(
+                openPosition, closedPosition,
+                openRotationQuat, closedRotationQuat
+            ));
+        }
+        else
+        {
+            StartCoroutine(AnimateDrawer(openPosition, closedPosition));
+        }
     }
 
-    // Без System.Action-замыкания: isAnimating сбрасывается прямо в корутине, без аллокации делегата
     private IEnumerator AnimateDrawer(Vector3 from, Vector3 to)
     {
         float duration = 1f / animationSpeed;
@@ -181,6 +208,34 @@ public class DrawerController : MonoBehaviour, Entety, IInteractable
 
         if (drawerTransform != null)
             drawerTransform.localPosition = to;
+
+        isAnimating = false;
+    }
+
+    private IEnumerator AnimateDrawerWithRotation(Vector3 fromPos, Vector3 toPos, Quaternion fromRot, Quaternion toRot)
+    {
+        float duration = 1f / animationSpeed;
+        float elapsed = 0f;
+
+        while (elapsed < duration)
+        {
+            elapsed += Time.deltaTime;
+            float t = Mathf.SmoothStep(0f, 1f, elapsed / duration);
+
+            if (drawerTransform != null)
+            {
+                drawerTransform.localPosition = Vector3.LerpUnclamped(fromPos, toPos, t);
+                drawerTransform.localRotation = Quaternion.Slerp(fromRot, toRot, t);
+            }
+
+            yield return null;
+        }
+
+        if (drawerTransform != null)
+        {
+            drawerTransform.localPosition = toPos;
+            drawerTransform.localRotation = toRot;
+        }
 
         isAnimating = false;
     }

@@ -91,7 +91,7 @@ public class InvokeManager : MonoBehaviour
     public void NextHistoryMoment()
     {
         if(IdHistory == 0){SmallTaskText.gameObject.SetActive(true);SmallTaskText.text = SmallTask[3].GetString(GameManager.Lang); Arrow.SetActive(false);}
-        if(IdHistory == 1){NextDialog();SmallTaskText.gameObject.SetActive(true);SmallTaskText.text = SmallTask[0].GetString(GameManager.Lang);Arrow.GetComponent<ArrowLineRenderer>().endObject = ArrowObjects[0].transform; Arrow.SetActive(true);}
+        if(IdHistory == 1){NextDialog();SmallTaskText.gameObject.SetActive(true);SmallTaskText.text = SmallTask[0].GetString(GameManager.Lang);if(ArrowObjects[0]!= null){Arrow.GetComponent<ArrowLineRenderer>().endObject = ArrowObjects[0].transform; Arrow.SetActive(true);}}
         if(IdHistory == 2){SmallTaskText.gameObject.SetActive(true);SmallTaskText.text = SmallTask[1].GetString(GameManager.Lang);Arrow.GetComponent<ArrowLineRenderer>().endObject = ArrowObjects[1].transform; Arrow.SetActive(true);}
         if(IdHistory == 3){SmallTaskText.gameObject.SetActive(true);SmallTaskText.text = SmallTask[2].GetString(GameManager.Lang); Arrow.SetActive(false);}
 
