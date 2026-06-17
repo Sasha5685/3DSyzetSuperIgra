@@ -11,7 +11,6 @@ GameObject:
   - component: {fileID: 283577991583699275}
   - component: {fileID: 385559310599478324}
   - component: {fileID: 896902519794025882}
-  - component: {fileID: 3542707879148327398}
   m_Layer: 0
   m_Name: Body
   m_TagString: Untagged
@@ -85,27 +84,6 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!65 &3542707879148327398
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 561126510504551605}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 1.8355093, y: 0.98747015, z: 5.0014935}
-  m_Center: {x: 0.060477734, y: 0.8325081, z: -0.058529377}
 --- !u!1 &1477362711276195807
 GameObject:
   m_ObjectHideFlags: 0
@@ -259,6 +237,8 @@ MonoBehaviour:
   pulseSpeed: 2
   pulseAmplitude: 8
   exitDelay: 1
+  TextHelp: {fileID: 0}
+  SmallCursor: {fileID: 0}
 --- !u!65 &5785421952075471908
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -293,6 +273,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   includeChildren: 1
+  extendedOutlineRange: 0
+  extendedRangeMultiplier: 2
 --- !u!82 &2140586593490071730
 AudioSource:
   m_ObjectHideFlags: 0

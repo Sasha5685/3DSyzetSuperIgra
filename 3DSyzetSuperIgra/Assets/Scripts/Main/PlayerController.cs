@@ -54,7 +54,6 @@ public class PlayerController : MonoBehaviour
     public void StopGame()
     {
         RunningGame = false;
-        BlackPanelStopGame.SetActive(true);
         Time.timeScale = 0f; // Останавливаем время в игре
         Cursor.visible = true;
         Cursor.lockState = CursorLockMode.None;
@@ -63,7 +62,6 @@ public class PlayerController : MonoBehaviour
     public void ResumeGame()
     {
         RunningGame = true;
-        BlackPanelStopGame.SetActive(false);
         Time.timeScale = 1f; // Возобновляем время
         Cursor.visible = false;
         Cursor.lockState = CursorLockMode.Locked;
@@ -83,10 +81,6 @@ public class PlayerController : MonoBehaviour
     private void Update()
     {
 
-        if (Input.GetKeyDown(KeyCode.Escape))
-        {
-            TogglePause();
-        }
         if(RunningGame == false)return;
         if (!isMobilePlatform)
         {

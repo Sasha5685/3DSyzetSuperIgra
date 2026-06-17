@@ -11,6 +11,8 @@ public class GameManager : MonoBehaviour
     public bool RunningGame;
     public string DeviceType = "PC";
     public string Lang;
+    public GameObject SettingsPanel;
+    public bool IsActiveSettings;
     private void Awake() 
     {
         instatiate = this;
@@ -21,6 +23,29 @@ public class GameManager : MonoBehaviour
     private void StartGame()
     {
         PlayerController.Initialized(DeviceType);
+    }
+
+    public void LateUpdate()
+    {
+        if (Input.GetKeyDown(KeyCode.Q))
+        {
+            //IsActiveSettings = !IsActiveSettings;
+            SetSettingsPanel(true);
+        }
+    }
+    public void SetSettingsPanel(bool active)
+    {
+        SettingsPanel.SetActive(active);
+        Cursor.visible = active;
+        if(active == true)
+        {
+            PlayerController.StopGame();
+        }
+        else
+        {
+            PlayerController.ResumeGame();
+        }
+        
     }
 }
 

@@ -6,6 +6,7 @@ public class BaseItem  : ScriptableObject
     public Sprite itemIcon;
     public GameObject itemPrefab;
     public GameObject itemModel;
+    public bool IsItem;
 }
 
 // Класс для ключей

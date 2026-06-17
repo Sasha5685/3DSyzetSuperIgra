@@ -389,6 +389,8 @@ public class CarController : MonoBehaviour, Entety, IInteractable
     {
         if (driving)
             return;
+
+        Debug.Log(111);
         if(Inventory.instatiate.HandItem("Car key"))
             EnterCar(
                 GameObject.FindGameObjectWithTag("Player")

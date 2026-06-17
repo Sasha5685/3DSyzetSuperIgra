@@ -226,20 +226,16 @@ public class Inventory : MonoBehaviour
     
     public void SelectSlot(Slot slot)
     {
-        if (slot == null)
-        {
-            Debug.LogWarning("Попытка выбрать null слот");
-            return;
-        }
-        
+        // Сначала снимаем выделение со всех слотов
         foreach (var s in SlotsInventory)
         {
-            if (s != null)
+            if (s != null && s != slot)
             {
                 s.SetSelected(false);
             }
         }
         
+        // Находим индекс выбранного слота
         for (int i = 0; i < SlotsInventory.Length; i++)
         {
             if (SlotsInventory[i] == slot)
@@ -249,14 +245,16 @@ public class Inventory : MonoBehaviour
             }
         }
         
+        // Выделяем выбранный слот
         slot.SetSelected(true);
         UseSlot = slot;
         
+        // Обновляем предмет в руках
         if (handItem != null)
         {
             if (slot.Item != null)
             {
-                handItem.ShowItem(slot.Item);  // ЭТО УЖЕ ДОЛЖНО БЫТЬ
+                handItem.ShowItem(slot.Item);
             }
             else
             {
@@ -289,7 +287,8 @@ public class Inventory : MonoBehaviour
     public void AddItem(BaseItem NewItem)
     {
         if (SlotsInventory == null) return;
-        if(NewItem.itemName.GetString("en") == "Tire iron")
+        
+        if (NewItem.itemName.GetString("en") == "Tire iron")
         {
             InvokeManager.instatiate.SendMessageEvent("PickCrowBar");
         }
@@ -301,11 +300,11 @@ public class Inventory : MonoBehaviour
             {
                 SlotsInventory[i].SetItem(NewItem, GameManager.Lang);
                 
-                // ВОТ ТУТ ВАЖНО: проверяем, является ли этот слот ВЫБРАННЫМ
+                // Проверяем, является ли этот слот выбранным
                 Slot currentSlot = GetCurrentSelectedSlot();
                 if (currentSlot != null && currentSlot == SlotsInventory[i])
                 {
-                    // Если да — показываем предмет в руках
+                    // Если да - показываем предмет в руках
                     if (handItem != null)
                     {
                         handItem.ShowItem(NewItem);
