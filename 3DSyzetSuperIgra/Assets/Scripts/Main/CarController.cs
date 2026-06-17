@@ -18,20 +18,18 @@ public class CarController : MonoBehaviour, Entety, IInteractable
     [SerializeField] private float handBrakeForce = 2000f;
 
     [Header("Sound")]
-    [SerializeField] private AudioSource engineSound; // Компонент звука двигателя
-    [SerializeField] private AudioClip enterSound;    // Звук входа в машину
-    [SerializeField] private AudioClip exitSound;     // Звук выхода из машины
-    [SerializeField] private float minPitch = 0.5f;   // Минимальная высота тона (на холостых)
-    [SerializeField] private float maxPitch = 2f;     // Максимальная высота тона (на полной скорости)
-    [SerializeField] private float maxSpeedForPitch = 30f; // Максимальная скорость для изменения тона
+    [SerializeField] private AudioSource engineSound;
+    [SerializeField] private AudioClip enterSound;
+    [SerializeField] private AudioClip exitSound;
+    [SerializeField] private float minPitch = 0.5f;
+    [SerializeField] private float maxPitch = 2f;
+    [SerializeField] private float maxSpeedForPitch = 30f;
 
     [Header("Outline")]
     [SerializeField] private float defaultWidth = 0.15f;
     [SerializeField] private Color defaultColor = new(1,1,1,0.5f);
-
     [SerializeField] private float highlightWidth = 0.6f;
     [SerializeField] private Color highlightColor = Color.yellow;
-
     [SerializeField] private bool pulse = true;
     [SerializeField] private float pulseSpeed = 2f;
     [SerializeField] private float pulseAmplitude = 0.2f;
@@ -39,30 +37,25 @@ public class CarController : MonoBehaviour, Entety, IInteractable
     private Rigidbody rb;
     private RearWheelDrive drive;
     private Outline outline;
-
     private PlayerController player;
     private Camera playerCamera;
-
     private bool driving;
-
     private float pulseTimer;
     private Vector3 cameraVelocity;
-
     private Transform cameraTransform;
-
     private Transform savedCameraParent;
     private Vector3 savedCameraLocalPosition;
     private Quaternion savedCameraLocalRotation;
     [SerializeField] private float exitDelay = 1f;
-
     private float enterTime;
     private VisibleObject visibleObject;
-    private AudioSource audioSource; // Для звуков входа/выхода
-
+    private AudioSource audioSource;
 
     public GameObject TextHelp;
-
     public GameObject SmallCursor;
+    
+    // Сохраняем исходные значения freeze для восстановления
+    private RigidbodyConstraints savedConstraints;
     
     private void Awake()
     {
@@ -71,21 +64,24 @@ public class CarController : MonoBehaviour, Entety, IInteractable
         outline = GetComponent<Outline>();
         visibleObject = GetComponent<VisibleObject>();
         
-        // Создаем отдельный AudioSource для звуков входа/выхода
         audioSource = gameObject.AddComponent<AudioSource>();
         audioSource.playOnAwake = false;
         
-        // Настраиваем двигатель
         if (engineSound == null)
             engineSound = gameObject.AddComponent<AudioSource>();
         
         outline.OutlineWidth = defaultWidth;
         outline.OutlineColor = defaultColor;
+        
+        // Сохраняем начальные ограничения
+        savedConstraints = rb.constraints;
+        
+        // Замораживаем физику по умолчанию
+        FreezePhysics();
     }
     
     private void Start()
     {
-        // Изначально звук двигателя выключен
         if (engineSound != null)
         {
             engineSound.loop = true;
@@ -107,7 +103,6 @@ public class CarController : MonoBehaviour, Entety, IInteractable
         if (Input.GetKey(KeyCode.Space))
             HandBrake();
         
-        // Обновляем звук двигателя в зависимости от скорости
         UpdateEngineSound();
     }
 
@@ -127,24 +122,73 @@ public class CarController : MonoBehaviour, Entety, IInteractable
         }
     }
 
+    #region Physics Freeze / Unfreeze
+    
+    /// <summary>
+    /// Полная заморозка физики по всем осям и поворотам
+    /// </summary>
+    private void FreezePhysics()
+    {
+        if (rb != null)
+        {
+            rb.constraints = RigidbodyConstraints.FreezeAll;
+            rb.velocity = Vector3.zero;
+            rb.angularVelocity = Vector3.zero;
+        }
+    }
+    
+    /// <summary>
+    /// Разморозка физики (только позиция, без поворотов)
+    /// </summary>
+    private void UnfreezePhysicsForDriving()
+    {
+        if (rb != null)
+        {
+         rb.constraints = RigidbodyConstraints.None;
+        }
+    }
+    
+    /// <summary>
+    /// Частичная разморозка (только для движения вперед/назад)
+    /// </summary>
+    private void UnfreezePhysicsPartial()
+    {
+        if (rb != null)
+        {
+            // Замораживаем всё кроме движения по X и Z (машина едет только вперед/назад)
+            rb.constraints = RigidbodyConstraints.FreezePositionY | 
+                            RigidbodyConstraints.FreezeRotationX | 
+                            RigidbodyConstraints.FreezeRotationZ;
+        }
+    }
+    
+    /// <summary>
+    /// Полная разморозка физики
+    /// </summary>
+    private void UnfreezePhysicsFull()
+    {
+        if (rb != null)
+        {
+            rb.constraints = RigidbodyConstraints.None;
+        }
+    }
+    
+    #endregion
+
     #region Sound
 
     private void UpdateEngineSound()
     {
         if (engineSound == null || !driving) return;
         
-        // Если двигатель не играет - запускаем
         if (!engineSound.isPlaying && driving)
         {
             engineSound.Play();
         }
         
-        // Изменяем тон в зависимости от скорости
         float speed = rb.velocity.magnitude;
         float t = Mathf.Clamp01(speed / maxSpeedForPitch);
         engineSound.pitch = Mathf.Lerp(minPitch, maxPitch, t);
-        
-        // Опционально: меняем громкость в зависимости от оборотов
         engineSound.volume = Mathf.Lerp(0.3f, 1f, t);
     }
     
@@ -180,20 +224,21 @@ public class CarController : MonoBehaviour, Entety, IInteractable
     {
         if (driving)
             return;
-            SmallCursor.SetActive(false);
+        
+        SmallCursor.SetActive(false);
         TextHelp.SetActive(true);
-                InvokeManager.instatiate.SendMessageEvent("GetInCar");
+        InvokeManager.instatiate.SendMessageEvent("GetInCar");
         enterTime = Time.time;
         HandItem.instatiate.itemHolder.gameObject.SetActive(false);
-        // Проигрываем звук входа
-        PlayEnterSound();
         
-        // Временно отключаем VisibleManager для этой машины
         visibleObject.SetIgnoreManager(true);
         
         // Устанавливаем drag когда игрок в машине
         rb.drag = 0.2f;
         rb.angularDrag = 5f;
+        
+        // РАЗМОРАЖИВАЕМ физику для управления машиной
+        UnfreezePhysicsForDriving();
         
         SetOutlineState(false);
 
@@ -219,7 +264,6 @@ public class CarController : MonoBehaviour, Entety, IInteractable
         rb.velocity = Vector3.zero;
         rb.angularVelocity = Vector3.zero;
         
-        // Запускаем звук двигателя с небольшой задержкой
         if (engineSound != null)
         {
             Invoke(nameof(StartEngineDelayed), 0.2f);
@@ -238,16 +282,14 @@ public class CarController : MonoBehaviour, Entety, IInteractable
     {
         if (!driving)
             return;
-                        SmallCursor.SetActive(true);
-                    TextHelp.SetActive(false);
-        HandItem.instatiate.itemHolder.gameObject.SetActive(true);
-        // Останавливаем звук двигателя
-        StopEngineSound();
         
-        // Проигрываем звук выхода
+        SmallCursor.SetActive(true);
+        TextHelp.SetActive(false);
+        HandItem.instatiate.itemHolder.gameObject.SetActive(true);
+        
+        StopEngineSound();
         PlayExitSound();
         
-        // Возвращаем управление VisibleManager
         visibleObject.SetIgnoreManager(false);
         
         // Возвращаем drag когда игрок вышел
@@ -257,6 +299,9 @@ public class CarController : MonoBehaviour, Entety, IInteractable
         // Мгновенная остановка перед выходом
         rb.velocity = Vector3.zero;
         rb.angularVelocity = Vector3.zero;
+        
+        // ЗАМОРАЖИВАЕМ физику полностью
+        FreezePhysics();
         
         SetOutlineState(true);
         driving = false;
@@ -381,16 +426,17 @@ public class CarController : MonoBehaviour, Entety, IInteractable
     {
         return null;
     }
+    
     private void SetOutlineState(bool state)
     {
         outline.enabled = state;
     }
+    
     public void Interact()
     {
         if (driving)
             return;
 
-        Debug.Log(111);
         if(Inventory.instatiate.HandItem("Car key"))
             EnterCar(
                 GameObject.FindGameObjectWithTag("Player")
