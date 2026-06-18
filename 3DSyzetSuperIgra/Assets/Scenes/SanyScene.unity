@@ -260,7 +260,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 4ad7e468739d28e4f8bb016f14a6f286, type: 2}
+  - {fileID: 2100000, guid: 7f0e016dd3dda4440bc407c98793473b, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -413,38 +413,6 @@ PrefabInstance:
     - target: {fileID: 4932411166195010463, guid: 09023bfbe74082c47a49d47ed96f63e2, type: 3}
       propertyPath: m_IsActive
       value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 5785421952075471908, guid: 09023bfbe74082c47a49d47ed96f63e2, type: 3}
-      propertyPath: m_Size.x
-      value: 1.7668815
-      objectReference: {fileID: 0}
-    - target: {fileID: 5785421952075471908, guid: 09023bfbe74082c47a49d47ed96f63e2, type: 3}
-      propertyPath: m_Size.y
-      value: 1.1381958
-      objectReference: {fileID: 0}
-    - target: {fileID: 5785421952075471908, guid: 09023bfbe74082c47a49d47ed96f63e2, type: 3}
-      propertyPath: m_Size.z
-      value: 5.111907
-      objectReference: {fileID: 0}
-    - target: {fileID: 5785421952075471908, guid: 09023bfbe74082c47a49d47ed96f63e2, type: 3}
-      propertyPath: m_Enabled
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 5785421952075471908, guid: 09023bfbe74082c47a49d47ed96f63e2, type: 3}
-      propertyPath: m_Center.x
-      value: -0.05090213
-      objectReference: {fileID: 0}
-    - target: {fileID: 5785421952075471908, guid: 09023bfbe74082c47a49d47ed96f63e2, type: 3}
-      propertyPath: m_Center.y
-      value: 0.15688503
-      objectReference: {fileID: 0}
-    - target: {fileID: 5785421952075471908, guid: 09023bfbe74082c47a49d47ed96f63e2, type: 3}
-      propertyPath: m_Center.z
-      value: 0.0927887
-      objectReference: {fileID: 0}
-    - target: {fileID: 5785421952075471908, guid: 09023bfbe74082c47a49d47ed96f63e2, type: 3}
-      propertyPath: m_IsTrigger
-      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6065162615198263611, guid: 09023bfbe74082c47a49d47ed96f63e2, type: 3}
       propertyPath: m_Enabled
@@ -1166,7 +1134,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 35d1cd859a7da054d8acc9d463c405ea, type: 2}
+  - {fileID: 824015559753126921, guid: f1dddfd1c5e31044e996da7ee3a1f7f1, type: 3}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -1307,6 +1275,7 @@ MonoBehaviour:
   - {fileID: 735318166}
   - {fileID: 735318166}
   globalAudioSource: {fileID: 1739632604}
+  sfxMixerGroup: {fileID: 7238510774079070348, guid: b96f1d42b2fdf634989c36cd5ca728d0, type: 2}
 --- !u!82 &1739632604
 AudioSource:
   m_ObjectHideFlags: 0
@@ -1316,7 +1285,7 @@ AudioSource:
   m_GameObject: {fileID: 1739632600}
   m_Enabled: 1
   serializedVersion: 4
-  OutputAudioMixerGroup: {fileID: 0}
+  OutputAudioMixerGroup: {fileID: 7238510774079070348, guid: b96f1d42b2fdf634989c36cd5ca728d0, type: 2}
   m_audioClip: {fileID: 0}
   m_PlayOnAwake: 0
   m_Volume: 1
@@ -2020,18 +1989,6 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 3262591964420894796, guid: b812d84d49ac32c4cb3a66741abb56e3, type: 3}
-      propertyPath: m_fontAsset
-      value: 
-      objectReference: {fileID: 11400000, guid: 087116b993a7e5944b718aed71563f7e, type: 2}
-    - target: {fileID: 3262591964420894796, guid: b812d84d49ac32c4cb3a66741abb56e3, type: 3}
-      propertyPath: m_sharedMaterial
-      value: 
-      objectReference: {fileID: -7001173130897995701, guid: 087116b993a7e5944b718aed71563f7e, type: 2}
-    - target: {fileID: 3262591964420894796, guid: b812d84d49ac32c4cb3a66741abb56e3, type: 3}
-      propertyPath: m_hasFontAssetChanged
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 3531923551912262334, guid: b812d84d49ac32c4cb3a66741abb56e3, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -2108,16 +2065,8 @@ PrefabInstance:
       propertyPath: m_AnchorMax.y
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 5558776453611376373, guid: b812d84d49ac32c4cb3a66741abb56e3, type: 3}
-      propertyPath: m_fontAsset
-      value: 
-      objectReference: {fileID: 11400000, guid: 087116b993a7e5944b718aed71563f7e, type: 2}
-    - target: {fileID: 5558776453611376373, guid: b812d84d49ac32c4cb3a66741abb56e3, type: 3}
-      propertyPath: m_sharedMaterial
-      value: 
-      objectReference: {fileID: -7001173130897995701, guid: 087116b993a7e5944b718aed71563f7e, type: 2}
-    - target: {fileID: 5558776453611376373, guid: b812d84d49ac32c4cb3a66741abb56e3, type: 3}
-      propertyPath: m_hasFontAssetChanged
+    - target: {fileID: 6052197827433587491, guid: b812d84d49ac32c4cb3a66741abb56e3, type: 3}
+      propertyPath: m_AnchoredPosition.x
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6143842266027312616, guid: b812d84d49ac32c4cb3a66741abb56e3, type: 3}
@@ -2193,8 +2142,8 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8126500327504811760, guid: b812d84d49ac32c4cb3a66741abb56e3, type: 3}
-      propertyPath: m_Enabled
-      value: 1
+      propertyPath: touchLookSpeedMultiplier
+      value: 1.5
       objectReference: {fileID: 0}
     - target: {fileID: 8275173225195886303, guid: b812d84d49ac32c4cb3a66741abb56e3, type: 3}
       propertyPath: m_AnchorMax.y

@@ -1,5 +1,6 @@
 using System.Collections;
 using UnityEngine;
+using UnityEngine.Audio;
 
 [RequireComponent(typeof(Rigidbody))]
 [RequireComponent(typeof(RearWheelDrive))]
@@ -24,6 +25,7 @@ public class CarController : MonoBehaviour, Entety, IInteractable
     [SerializeField] private float minPitch = 0.5f;
     [SerializeField] private float maxPitch = 2f;
     [SerializeField] private float maxSpeedForPitch = 30f;
+    [SerializeField] private AudioMixerGroup sfxMixerGroup;
 
     [Header("Outline")]
     [SerializeField] private float defaultWidth = 0.15f;
@@ -54,7 +56,6 @@ public class CarController : MonoBehaviour, Entety, IInteractable
     public GameObject TextHelp;
     public GameObject SmallCursor;
     
-    // Сохраняем исходные значения freeze для восстановления
     private RigidbodyConstraints savedConstraints;
     
     private void Awake()
@@ -64,19 +65,27 @@ public class CarController : MonoBehaviour, Entety, IInteractable
         outline = GetComponent<Outline>();
         visibleObject = GetComponent<VisibleObject>();
         
+        // Настраиваем AudioSource для звуков входа/выхода
         audioSource = gameObject.AddComponent<AudioSource>();
         audioSource.playOnAwake = false;
+        audioSource.volume = 1f;
+        if (sfxMixerGroup != null)
+        {
+            audioSource.outputAudioMixerGroup = sfxMixerGroup;
+        }
         
+        // Настраиваем AudioSource для двигателя
         if (engineSound == null)
             engineSound = gameObject.AddComponent<AudioSource>();
+        if (sfxMixerGroup != null)
+        {
+            engineSound.outputAudioMixerGroup = sfxMixerGroup;
+        }
         
         outline.OutlineWidth = defaultWidth;
         outline.OutlineColor = defaultColor;
         
-        // Сохраняем начальные ограничения
         savedConstraints = rb.constraints;
-        
-        // Замораживаем физику по умолчанию
         FreezePhysics();
     }
     
@@ -124,9 +133,6 @@ public class CarController : MonoBehaviour, Entety, IInteractable
 
     #region Physics Freeze / Unfreeze
     
-    /// <summary>
-    /// Полная заморозка физики по всем осям и поворотам
-    /// </summary>
     private void FreezePhysics()
     {
         if (rb != null)
@@ -137,35 +143,7 @@ public class CarController : MonoBehaviour, Entety, IInteractable
         }
     }
     
-    /// <summary>
-    /// Разморозка физики (только позиция, без поворотов)
-    /// </summary>
     private void UnfreezePhysicsForDriving()
-    {
-        if (rb != null)
-        {
-         rb.constraints = RigidbodyConstraints.None;
-        }
-    }
-    
-    /// <summary>
-    /// Частичная разморозка (только для движения вперед/назад)
-    /// </summary>
-    private void UnfreezePhysicsPartial()
-    {
-        if (rb != null)
-        {
-            // Замораживаем всё кроме движения по X и Z (машина едет только вперед/назад)
-            rb.constraints = RigidbodyConstraints.FreezePositionY | 
-                            RigidbodyConstraints.FreezeRotationX | 
-                            RigidbodyConstraints.FreezeRotationZ;
-        }
-    }
-    
-    /// <summary>
-    /// Полная разморозка физики
-    /// </summary>
-    private void UnfreezePhysicsFull()
     {
         if (rb != null)
         {
@@ -181,6 +159,13 @@ public class CarController : MonoBehaviour, Entety, IInteractable
     {
         if (engineSound == null || !driving) return;
         
+        if (GameManager.instatiate != null && !GameManager.instatiate.RunningGame)
+        {
+            if (engineSound.isPlaying)
+                engineSound.Pause();
+            return;
+        }
+        
         if (!engineSound.isPlaying && driving)
         {
             engineSound.Play();
@@ -191,28 +176,44 @@ public class CarController : MonoBehaviour, Entety, IInteractable
         engineSound.pitch = Mathf.Lerp(minPitch, maxPitch, t);
         engineSound.volume = Mathf.Lerp(0.3f, 1f, t);
     }
-    
+
     private void PlayEnterSound()
     {
-        if (enterSound != null && audioSource != null)
-        {
-            audioSource.PlayOneShot(enterSound, 0.7f);
-        }
+        if (enterSound == null || audioSource == null) return;
+        if (GameManager.instatiate != null && !GameManager.instatiate.RunningGame) return;
+        
+        audioSource.PlayOneShot(enterSound, 1f);
     }
-    
+
     private void PlayExitSound()
     {
-        if (exitSound != null && audioSource != null)
-        {
-            audioSource.PlayOneShot(exitSound, 0.7f);
-        }
+        if (exitSound == null || audioSource == null) return;
+        if (GameManager.instatiate != null && !GameManager.instatiate.RunningGame) return;
+        
+        audioSource.PlayOneShot(exitSound, 1f);
     }
-    
+
     private void StopEngineSound()
     {
         if (engineSound != null && engineSound.isPlaying)
         {
             engineSound.Stop();
+        }
+    }
+
+    public void PauseEngineSound()
+    {
+        if (engineSound != null && engineSound.isPlaying)
+        {
+            engineSound.Pause();
+        }
+    }
+
+    public void ResumeEngineSound()
+    {
+        if (engineSound != null && !engineSound.isPlaying && driving)
+        {
+            engineSound.Play();
         }
     }
 
@@ -225,6 +226,8 @@ public class CarController : MonoBehaviour, Entety, IInteractable
         if (driving)
             return;
         
+        PlayEnterSound();
+        
         SmallCursor.SetActive(false);
         TextHelp.SetActive(true);
         InvokeManager.instatiate.SendMessageEvent("GetInCar");
@@ -233,11 +236,9 @@ public class CarController : MonoBehaviour, Entety, IInteractable
         
         visibleObject.SetIgnoreManager(true);
         
-        // Устанавливаем drag когда игрок в машине
         rb.drag = 0.2f;
         rb.angularDrag = 5f;
         
-        // РАЗМОРАЖИВАЕМ физику для управления машиной
         UnfreezePhysicsForDriving();
         
         SetOutlineState(false);
@@ -283,24 +284,21 @@ public class CarController : MonoBehaviour, Entety, IInteractable
         if (!driving)
             return;
         
+        StopEngineSound();
+        PlayExitSound();
+        
         SmallCursor.SetActive(true);
         TextHelp.SetActive(false);
         HandItem.instatiate.itemHolder.gameObject.SetActive(true);
         
-        StopEngineSound();
-        PlayExitSound();
-        
         visibleObject.SetIgnoreManager(false);
         
-        // Возвращаем drag когда игрок вышел
         rb.drag = 10f;
         rb.angularDrag = 0.05f;
         
-        // Мгновенная остановка перед выходом
         rb.velocity = Vector3.zero;
         rb.angularVelocity = Vector3.zero;
         
-        // ЗАМОРАЖИВАЕМ физику полностью
         FreezePhysics();
         
         SetOutlineState(true);
@@ -332,11 +330,6 @@ public class CarController : MonoBehaviour, Entety, IInteractable
         cameraTransform = null;
     }
 
-    private void ResetDrag()
-    {
-        rb.drag = 0.1f;
-        rb.angularDrag = 0.05f;
-    }
     #endregion
 
     #region Camera

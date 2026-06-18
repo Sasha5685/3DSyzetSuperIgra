@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Audio;
 
 public class Inventory : MonoBehaviour
 {
@@ -8,35 +9,48 @@ public class Inventory : MonoBehaviour
     public Slot UseSlot;
     public HandItem handItem;
     public static Inventory instatiate;
+    
     [Header("Throw Settings")]
     public float throwForce = 10f;
     public float throwUpwardForce = 5f;
-    public Transform throwPoint; // Точка откуда вылетает предмет
-    
-    private int currentSelectedSlotIndex = 0;
-    private bool isInitialized = false;
+    public Transform throwPoint;
+
     [Header("Sound Settings")]
     [SerializeField] private AudioClip pickupSound;
-        [SerializeField] private AudioClip KickSound;
+    [SerializeField] private AudioClip KickSound;
     [SerializeField] [Range(0f, 1f)] private float pickupVolume = 0.7f;
+    [SerializeField] private AudioMixerGroup sfxMixerGroup;
 
+    private int currentSelectedSlotIndex = 0;
+    private bool isInitialized = false;
     public GameManager GameManager;
+
+    private AudioSource audioSource;
+
     void Awake()
     {
         instatiate = this;
+        
+        audioSource = gameObject.AddComponent<AudioSource>();
+        audioSource.playOnAwake = false;
+        audioSource.loop = false;
+        audioSource.volume = 1f;
+        
+        if (sfxMixerGroup != null)
+        {
+            audioSource.outputAudioMixerGroup = sfxMixerGroup;
+        }
     }
+
     void Start()
     {
         GameManager = GameManager.instatiate;
-
         StartCoroutine(InitializeInventory());
     }
     
     IEnumerator InitializeInventory()
     {
-        // Ждем один кадр, чтобы UI успел инициализироваться
         yield return null;
-        
         CleanSlotsArray();
         
         if (SlotsInventory != null && SlotsInventory.Length > 0 && SlotsInventory[0] != null)
@@ -89,17 +103,14 @@ public class Inventory : MonoBehaviour
             }
         }
         
-        // Бросок предмета на клавишу T
         if (Input.GetKeyDown(KeyCode.T))
         {
             ThrowCurrentItem();
         }
     }
     
-    // Новый метод для броска предмета
     public void ThrowCurrentItem()
     {
-        // Получаем текущий выбранный слот
         Slot currentSlot = GetCurrentSelectedSlot();
         
         if (currentSlot == null)
@@ -114,47 +125,36 @@ public class Inventory : MonoBehaviour
             return;
         }
 
-        // Получаем предмет
-        BaseItem  itemToThrow = currentSlot.Item;
+        BaseItem itemToThrow = currentSlot.Item;
         
         if (itemToThrow == null || itemToThrow.itemPrefab == null)
         {
             Debug.LogWarning("У предмета нет префаба для броска");
             return;
         }
-                PlayKickSound();
-        // Создаем физический объект для броска
+        
+        PlayKickSound();
+        
         GameObject thrownItem = Instantiate(itemToThrow.itemPrefab, GetThrowPosition(), Quaternion.identity);
         
-        
-        // Добавляем физику для броска
         Rigidbody rb = thrownItem.GetComponent<Rigidbody>();
         if (rb == null)
         {
             rb = thrownItem.AddComponent<Rigidbody>();
         }
         
-        // Рассчитываем направление броска
         Vector3 throwDirection = GetThrowDirection();
-        
-        // Добавляем силу для броска
         rb.AddForce(throwDirection * throwForce + Vector3.up * throwUpwardForce, ForceMode.Impulse);
-        
-        // Добавляем случайное вращение
         rb.AddTorque(Random.insideUnitSphere * 5f, ForceMode.Impulse);
         
-        // Очищаем слот
         currentSlot.SetItem(null, null);
         
-        // Убираем модель из рук
         if (handItem != null && handItem.GetCurrentItem() == itemToThrow)
         {
             handItem.ClearCurrentItem();
         }
-        
     }
     
-    // Получаем позицию для броска
     private Vector3 GetThrowPosition()
     {
         if (throwPoint != null)
@@ -162,18 +162,15 @@ public class Inventory : MonoBehaviour
             return throwPoint.position;
         }
         
-        // Если точка не задана, используем позицию камеры
         Camera cam = Camera.main;
         if (cam != null)
         {
             return cam.transform.position + cam.transform.forward * 1f;
         }
         
-        // Если нет камеры, используем позицию инвентаря
         return transform.position + Vector3.up * 1.5f + transform.forward;
     }
     
-    // Получаем направление для броска
     private Vector3 GetThrowDirection()
     {
         if (throwPoint != null)
@@ -226,7 +223,6 @@ public class Inventory : MonoBehaviour
     
     public void SelectSlot(Slot slot)
     {
-        // Сначала снимаем выделение со всех слотов
         foreach (var s in SlotsInventory)
         {
             if (s != null && s != slot)
@@ -235,7 +231,6 @@ public class Inventory : MonoBehaviour
             }
         }
         
-        // Находим индекс выбранного слота
         for (int i = 0; i < SlotsInventory.Length; i++)
         {
             if (SlotsInventory[i] == slot)
@@ -245,11 +240,9 @@ public class Inventory : MonoBehaviour
             }
         }
         
-        // Выделяем выбранный слот
         slot.SetSelected(true);
         UseSlot = slot;
         
-        // Обновляем предмет в руках
         if (handItem != null)
         {
             if (slot.Item != null)
@@ -272,6 +265,7 @@ public class Inventory : MonoBehaviour
         }
         return null;
     }
+    
     public bool HandItem(string Name)
     {
         for (int i = 0; i < SlotsInventory.Length; i++)
@@ -284,6 +278,7 @@ public class Inventory : MonoBehaviour
         }
         return false;
     }
+    
     public void AddItem(BaseItem NewItem)
     {
         if (SlotsInventory == null) return;
@@ -292,6 +287,7 @@ public class Inventory : MonoBehaviour
         {
             InvokeManager.instatiate.SendMessageEvent("PickCrowBar");
         }
+        
         PlayPickupSound();
         
         for (int i = 0; i < SlotsInventory.Length; i++)
@@ -300,11 +296,9 @@ public class Inventory : MonoBehaviour
             {
                 SlotsInventory[i].SetItem(NewItem, GameManager.Lang);
                 
-                // Проверяем, является ли этот слот выбранным
                 Slot currentSlot = GetCurrentSelectedSlot();
                 if (currentSlot != null && currentSlot == SlotsInventory[i])
                 {
-                    // Если да - показываем предмет в руках
                     if (handItem != null)
                     {
                         handItem.ShowItem(NewItem);
@@ -316,6 +310,7 @@ public class Inventory : MonoBehaviour
         
         Debug.LogWarning("Нет свободных слотов для добавления предмета");
     }
+    
     public void RefreshCurrentSlot()
     {
         Slot currentSlot = GetCurrentSelectedSlot();
@@ -331,12 +326,20 @@ public class Inventory : MonoBehaviour
             }
         }
     }
+    
+    #region Sound Methods
+
     private void PlayPickupSound()
     {
-            AudioSource.PlayClipAtPoint(pickupSound, Camera.main.transform.position, pickupVolume);
+        if (pickupSound == null || audioSource == null) return;
+        audioSource.PlayOneShot(pickupSound, pickupVolume);
     }
+    
     private void PlayKickSound()
     {
-            AudioSource.PlayClipAtPoint(KickSound, Camera.main.transform.position, pickupVolume);
+        if (KickSound == null || audioSource == null) return;
+        audioSource.PlayOneShot(KickSound, pickupVolume);
     }
+
+    #endregion
 }

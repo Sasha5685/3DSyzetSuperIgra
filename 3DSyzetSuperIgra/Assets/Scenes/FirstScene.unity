@@ -78046,6 +78046,7 @@ MonoBehaviour:
   - {fileID: 77594921}
   - {fileID: 77594921}
   globalAudioSource: {fileID: 1312994544}
+  sfxMixerGroup: {fileID: 0}
 --- !u!82 &1312994544
 AudioSource:
   m_ObjectHideFlags: 0
@@ -121607,6 +121608,38 @@ PrefabInstance:
     - target: {fileID: 8668661793778649954, guid: b812d84d49ac32c4cb3a66741abb56e3, type: 3}
       propertyPath: m_AnchoredPosition.y
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8706735332996815163, guid: b812d84d49ac32c4cb3a66741abb56e3, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 223.957
+      objectReference: {fileID: 0}
+    - target: {fileID: 8706735332996815163, guid: b812d84d49ac32c4cb3a66741abb56e3, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -2246.1018
+      objectReference: {fileID: 0}
+    - target: {fileID: 8706735332996815163, guid: b812d84d49ac32c4cb3a66741abb56e3, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 278.681
+      objectReference: {fileID: 0}
+    - target: {fileID: 8706735332996815163, guid: b812d84d49ac32c4cb3a66741abb56e3, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.99144495
+      objectReference: {fileID: 0}
+    - target: {fileID: 8706735332996815163, guid: b812d84d49ac32c4cb3a66741abb56e3, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8706735332996815163, guid: b812d84d49ac32c4cb3a66741abb56e3, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0.13052598
+      objectReference: {fileID: 0}
+    - target: {fileID: 8706735332996815163, guid: b812d84d49ac32c4cb3a66741abb56e3, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8706735332996815163, guid: b812d84d49ac32c4cb3a66741abb56e3, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 15
       objectReference: {fileID: 0}
     - target: {fileID: 8756036312684991724, guid: b812d84d49ac32c4cb3a66741abb56e3, type: 3}
       propertyPath: m_AnchorMax.y

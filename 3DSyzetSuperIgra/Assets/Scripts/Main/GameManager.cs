@@ -1,22 +1,28 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
 using YG;
 
 public class GameManager : MonoBehaviour
 {
     public static GameManager instatiate;
     public PlayerController PlayerController;
-    public bool RunningGame;
+    public bool RunningGame = true;
     public string DeviceType = "PC";
     public string Lang;
     public GameObject SettingsPanel;
     public bool IsActiveSettings;
+    public bool deviceIsDesktop;
+    
+    // Событие для остановки всех звуков при паузе
+    public static event System.Action<bool> OnPauseStateChanged;
+    
     private void Awake() 
     {
         instatiate = this;
-        Lang = YG2.lang;
+        
+        Lang = YG2.envir.language;
+        deviceIsDesktop = YG2.envir.isDesktop;
+        
+        DeviceType = deviceIsDesktop ? "PC" : "Mobile";
         StartGame();
     }
     
@@ -29,23 +35,40 @@ public class GameManager : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.Q))
         {
-            //IsActiveSettings = !IsActiveSettings;
-            SetSettingsPanel(true);
+            SetSettingsPanel(!IsActiveSettings);
         }
     }
+    
+    // В GameManager в методе SetSettingsPanel:
     public void SetSettingsPanel(bool active)
     {
+        IsActiveSettings = active;
         SettingsPanel.SetActive(active);
         Cursor.visible = active;
-        if(active == true)
+        
+        DialogSystem dialogSystem = FindObjectOfType<DialogSystem>();
+        
+        if (active)
         {
+            RunningGame = false;
             PlayerController.StopGame();
+            PlayerController.SetAdButtonsEnabled(false);
+            
+            if (dialogSystem != null)
+            {
+                dialogSystem.PauseDialogSound();
+            }
         }
         else
         {
+            RunningGame = true;
             PlayerController.ResumeGame();
+            PlayerController.SetAdButtonsEnabled(true);
+            
+            if (dialogSystem != null)
+            {
+                dialogSystem.ResumeDialogSound();
+            }
         }
-        
     }
 }
-

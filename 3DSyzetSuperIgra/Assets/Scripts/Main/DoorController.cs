@@ -218,7 +218,6 @@ public class DoorController : MonoBehaviour, Entety, IInteractable
         {
             CloseDoor();
         }
-        Debug.Log(1);
     }
     
     private void RepitOpenDoor()
