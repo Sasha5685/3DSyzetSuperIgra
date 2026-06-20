@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Audio;
 
-public class Inventory : MonoBehaviour
+public class Inventory : MusicSystem
 {
     public Slot[] SlotsInventory;
     public Slot UseSlot;
@@ -25,21 +25,12 @@ public class Inventory : MonoBehaviour
     private bool isInitialized = false;
     public GameManager GameManager;
 
-    private AudioSource audioSource;
 
     void Awake()
     {
         instatiate = this;
         
-        audioSource = gameObject.AddComponent<AudioSource>();
-        audioSource.playOnAwake = false;
-        audioSource.loop = false;
-        audioSource.volume = 1f;
-        
-        if (sfxMixerGroup != null)
-        {
-            audioSource.outputAudioMixerGroup = sfxMixerGroup;
-        }
+        InitSystem(sfxMixerGroup);
     }
 
     void Start()
@@ -133,7 +124,7 @@ public class Inventory : MonoBehaviour
             return;
         }
         
-        PlayKickSound();
+        ShotSound(KickSound, pickupVolume);
         
         GameObject thrownItem = Instantiate(itemToThrow.itemPrefab, GetThrowPosition(), Quaternion.identity);
         
@@ -288,7 +279,7 @@ public class Inventory : MonoBehaviour
             InvokeManager.instatiate.SendMessageEvent("PickCrowBar");
         }
         
-        PlayPickupSound();
+        ShotSound(pickupSound, pickupVolume);
         
         for (int i = 0; i < SlotsInventory.Length; i++)
         {
@@ -326,20 +317,4 @@ public class Inventory : MonoBehaviour
             }
         }
     }
-    
-    #region Sound Methods
-
-    private void PlayPickupSound()
-    {
-        if (pickupSound == null || audioSource == null) return;
-        audioSource.PlayOneShot(pickupSound, pickupVolume);
-    }
-    
-    private void PlayKickSound()
-    {
-        if (KickSound == null || audioSource == null) return;
-        audioSource.PlayOneShot(KickSound, pickupVolume);
-    }
-
-    #endregion
 }

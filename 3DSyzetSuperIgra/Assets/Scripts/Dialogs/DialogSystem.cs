@@ -2,7 +2,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.Audio;
 
-public class DialogSystem : MonoBehaviour
+public class DialogSystem : MusicSystem
 {
     [SerializeField] private DialogsList DialogsList;
     [SerializeField] private GameObject PrefabTextMeshPro;
@@ -17,17 +17,13 @@ public class DialogSystem : MonoBehaviour
     private GameObject TextMeshProDialog;
     private GameManager GameManager;
     
-    [SerializeField] private AudioSource globalAudioSource;
     [SerializeField] private AudioMixerGroup sfxMixerGroup;
     
     private bool isDialogActive = false; // Флаг активного диалога
 
     private void Awake()
     {
-        if (globalAudioSource != null && sfxMixerGroup != null)
-        {
-            globalAudioSource.outputAudioMixerGroup = sfxMixerGroup;
-        }
+        InitSystem(sfxMixerGroup);
     }
 
     public void StartLoad()
@@ -70,14 +66,8 @@ public class DialogSystem : MonoBehaviour
     
     private void PlayDialogSound()
     {
-        if (globalAudioSource == null) return;
-        
         AudioClip clip = ThisDialog.AudioClip.GetAudio(GameManager.Lang);
-        if (clip != null)
-        {
-            globalAudioSource.clip = clip;
-            globalAudioSource.Play();
-        }
+        ShotSound(clip);
     }
     
     private void ClearDialogInScene()
@@ -90,8 +80,7 @@ public class DialogSystem : MonoBehaviour
     
     public void DialogComplite()
     {
-        if (globalAudioSource != null && globalAudioSource.isPlaying)
-            globalAudioSource.Stop();
+        StopSound();
         
         ClearDialogInScene();
         IdDialog++;
@@ -109,29 +98,29 @@ public class DialogSystem : MonoBehaviour
     public void PauseDialogSound()
     {
         // Пауза только если диалог активен
-        if (!isDialogActive) return;
+        // if (!isDialogActive) return;
         
-        if (globalAudioSource != null && globalAudioSource.isPlaying)
-        {
-            globalAudioSource.Pause();
-        }
+        // if (globalAudioSource != null && globalAudioSource.isPlaying)
+        // {
+        //     globalAudioSource.Pause();
+        // }
     }
 
     public void ResumeDialogSound()
     {
         // Возобновляем только если диалог активен
-        if (!isDialogActive) return;
+        // if (!isDialogActive) return;
         
-        if (globalAudioSource != null && globalAudioSource.clip != null)
-        {
-            if (!globalAudioSource.isPlaying && globalAudioSource.time > 0)
-            {
-                globalAudioSource.UnPause();
-            }
-            else if (!globalAudioSource.isPlaying && globalAudioSource.time == 0)
-            {
-                globalAudioSource.Play();
-            }
-        }
+        // if (globalAudioSource != null && globalAudioSource.clip != null)
+        // {
+        //     if (!globalAudioSource.isPlaying && globalAudioSource.time > 0)
+        //     {
+        //         globalAudioSource.UnPause();
+        //     }
+        //     else if (!globalAudioSource.isPlaying && globalAudioSource.time == 0)
+        //     {
+        //         globalAudioSource.Play();
+        //     }
+        // }
     }
 }

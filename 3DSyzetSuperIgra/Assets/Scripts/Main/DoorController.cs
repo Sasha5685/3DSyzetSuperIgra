@@ -1,7 +1,8 @@
 using UnityEngine;
 using System.Collections;
+using UnityEngine.Audio;
 
-public class DoorController : MonoBehaviour, Entety, IInteractable
+public class DoorController : MusicSystem, Entety, IInteractable
 {
     [Header("Door Settings")]
     [SerializeField] private Animator doorAnimator;
@@ -11,7 +12,6 @@ public class DoorController : MonoBehaviour, Entety, IInteractable
     [SerializeField] private float animationDuration = 1f;
     
     [Header("Audio Settings")]
-    [SerializeField] private AudioSource audioSource;
     [SerializeField] private AudioClip openSound;
     [SerializeField] private AudioClip RepitOpenDoorSound;
     [SerializeField] private AudioClip closeSound;
@@ -36,12 +36,13 @@ public class DoorController : MonoBehaviour, Entety, IInteractable
     private bool isAnimating = false;
     private bool playerLayerWasExcluded = false;
     public bool LockDoor;
+    public AudioMixerGroup audioMixer;
     
     void Awake()
     {
         SetupOutline();
         SetupAnimator();
-        SetupAudio();
+        InitSystem(audioMixer);
         SetupCollider();
     }
     
@@ -90,23 +91,6 @@ public class DoorController : MonoBehaviour, Entety, IInteractable
         }
     }
     
-    private void SetupAudio()
-    {
-        if (audioSource == null)
-        {
-            audioSource = GetComponent<AudioSource>();
-            if (audioSource == null && (openSound != null || closeSound != null))
-            {
-                audioSource = gameObject.AddComponent<AudioSource>();
-            }
-        }
-        
-        if (audioSource != null)
-        {
-            audioSource.volume = soundVolume;
-            audioSource.playOnAwake = false;
-        }
-    }
     
     private void SetupCollider()
     {
@@ -139,14 +123,6 @@ public class DoorController : MonoBehaviour, Entety, IInteractable
                 doorCollider.excludeLayers &= ~playerLayer;
                 playerLayerWasExcluded = false;
             }
-        }
-    }
-    
-    private void PlaySound(AudioClip clip)
-    {
-        if (audioSource != null && clip != null)
-        {
-            audioSource.PlayOneShot(clip, soundVolume);
         }
     }
     
@@ -222,7 +198,7 @@ public class DoorController : MonoBehaviour, Entety, IInteractable
     
     private void RepitOpenDoor()
     {
-        PlaySound(RepitOpenDoorSound);
+        ShotSound(RepitOpenDoorSound);
         
         if (doorAnimator != null)
         {
@@ -252,7 +228,7 @@ public class DoorController : MonoBehaviour, Entety, IInteractable
     private void OpenDoor()
     {
         ExcludePlayerLayer(true);
-        PlaySound(openSound);
+        ShotSound(openSound);
         
         if (doorAnimator != null)
         {
@@ -282,7 +258,7 @@ public class DoorController : MonoBehaviour, Entety, IInteractable
     private void CloseDoor()
     {
         ExcludePlayerLayer(false);
-        PlaySound(closeSound);
+        ShotSound(closeSound);
         
         if (doorAnimator != null)
         {

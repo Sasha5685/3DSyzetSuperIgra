@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 33c2b1cb5d59e0d45b01ae29cdead32d
+guid: de48f80f667058b4a807c6b811bda0a1
 TrueTypeFontImporter:
   externalObjects: {}
   serializedVersion: 4
@@ -9,7 +9,7 @@ TrueTypeFontImporter:
   characterPadding: 1
   includeFontData: 1
   fontNames:
-  - Incrediball Adventures
+  - Sporefunkfont
   fallbackFontReferences: []
   customCharacters: 
   fontRenderingMode: 0
