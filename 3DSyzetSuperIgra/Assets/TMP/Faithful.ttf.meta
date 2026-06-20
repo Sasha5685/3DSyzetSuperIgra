@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: de48f80f667058b4a807c6b811bda0a1
+guid: 0ee9e8cbd0f6f5e44bdbb52d32e469a5
 TrueTypeFontImporter:
   externalObjects: {}
   serializedVersion: 4
@@ -9,7 +9,7 @@ TrueTypeFontImporter:
   characterPadding: 1
   includeFontData: 1
   fontNames:
-  - Sporefunkfont
+  - Compliance Sans
   fallbackFontReferences: []
   customCharacters: 
   fontRenderingMode: 0

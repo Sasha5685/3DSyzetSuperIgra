@@ -15,7 +15,7 @@ public class DoorController : MusicSystem, Entety, IInteractable
     [SerializeField] private AudioClip openSound;
     [SerializeField] private AudioClip RepitOpenDoorSound;
     [SerializeField] private AudioClip closeSound;
-    [SerializeField] private float soundVolume = 1f;
+    [SerializeField] private AudioClip NoKeys;
     
     [Header("Collider Settings")]
     [SerializeField] private Collider doorCollider;

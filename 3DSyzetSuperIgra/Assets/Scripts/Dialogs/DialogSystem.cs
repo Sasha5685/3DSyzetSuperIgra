@@ -1,6 +1,7 @@
 using TMPro;
 using UnityEngine;
 using UnityEngine.Audio;
+using System.Collections.Generic;
 
 public class DialogSystem : MusicSystem
 {
@@ -25,14 +26,27 @@ public class DialogSystem : MusicSystem
     {
         InitSystem(sfxMixerGroup);
     }
-
+    private void Start()
+    {
+        GameManager.OnPauseStateChanged += HandlePauseState;
+    }
     public void StartLoad()
     {
         GameManager = GameManager.instatiate;
         LoadIdDialog();
         DemonstrationDialogInScene();
     }
-    
+    private void HandlePauseState(bool isPaused)
+    {
+        if (isPaused)
+        {
+            StopSound();
+        }
+        else
+        {
+            ResumeSound();
+        }
+    }
     private void LoadIdDialog()
     {
         IdDialog = PlayerPrefs.GetInt("DialogId", 0);
@@ -80,7 +94,7 @@ public class DialogSystem : MusicSystem
     
     public void DialogComplite()
     {
-        StopSound();
+        ClearSound();
         
         ClearDialogInScene();
         IdDialog++;

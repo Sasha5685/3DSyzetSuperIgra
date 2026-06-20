@@ -5,7 +5,7 @@ using UnityEngine.Audio;
 [RequireComponent(typeof(Rigidbody))]
 [RequireComponent(typeof(RearWheelDrive))]
 [RequireComponent(typeof(Outline))]
-public class CarController : MonoBehaviour, Entety, IInteractable
+public class CarController : MusicSystem, Entety, IInteractable
 {
     [Header("Player")]
     [SerializeField] private Transform exitPoint;
@@ -19,9 +19,10 @@ public class CarController : MonoBehaviour, Entety, IInteractable
     [SerializeField] private float handBrakeForce = 2000f;
 
     [Header("Sound")]
-    [SerializeField] private AudioSource engineSound;
+    [SerializeField] private AudioClip engineClip;
     [SerializeField] private AudioClip enterSound;
     [SerializeField] private AudioClip exitSound;
+    [SerializeField] private AudioClip NoKeys;
     [SerializeField] private float minPitch = 0.5f;
     [SerializeField] private float maxPitch = 2f;
     [SerializeField] private float maxSpeedForPitch = 30f;
@@ -51,7 +52,9 @@ public class CarController : MonoBehaviour, Entety, IInteractable
     [SerializeField] private float exitDelay = 1f;
     private float enterTime;
     private VisibleObject visibleObject;
-    private AudioSource audioSource;
+    
+    // Дополнительный MusicSystem для SFX (звуки входа/выхода)
+    private MusicSystem sfxMusicSystem;
 
     public GameObject TextHelp;
     public GameObject SmallCursor;
@@ -65,21 +68,19 @@ public class CarController : MonoBehaviour, Entety, IInteractable
         outline = GetComponent<Outline>();
         visibleObject = GetComponent<VisibleObject>();
         
-        // Настраиваем AudioSource для звуков входа/выхода
-        audioSource = gameObject.AddComponent<AudioSource>();
-        audioSource.playOnAwake = false;
-        audioSource.volume = 1f;
-        if (sfxMixerGroup != null)
-        {
-            audioSource.outputAudioMixerGroup = sfxMixerGroup;
-        }
+        // Инициализируем MusicSystem (этот объект) для двигателя с loop = true
+        InitSystem(sfxMixerGroup, true);
+        SetLoop(true);
         
-        // Настраиваем AudioSource для двигателя
-        if (engineSound == null)
-            engineSound = gameObject.AddComponent<AudioSource>();
-        if (sfxMixerGroup != null)
+        // Создаем отдельный MusicSystem для SFX (звуки входа/выхода)
+        sfxMusicSystem = gameObject.AddComponent<MusicSystem>();
+        sfxMusicSystem.InitSystem(sfxMixerGroup, false);
+        sfxMusicSystem.SetLoop(false);
+        
+        // Устанавливаем клип двигателя
+        if (engineClip != null)
         {
-            engineSound.outputAudioMixerGroup = sfxMixerGroup;
+            SetClip(engineClip);
         }
         
         outline.OutlineWidth = defaultWidth;
@@ -91,11 +92,19 @@ public class CarController : MonoBehaviour, Entety, IInteractable
     
     private void Start()
     {
-        if (engineSound != null)
-        {
-            engineSound.loop = true;
-            engineSound.playOnAwake = false;
-        }
+        // Подписываемся на событие паузы
+        GameManager.OnPauseStateChanged += HandlePauseState;
+    }
+
+    private void OnDestroy()
+    {
+        // Отписываемся от события
+        GameManager.OnPauseStateChanged -= HandlePauseState;
+        
+        // Очищаем звуки
+        ClearSound();
+        if (sfxMusicSystem != null)
+            sfxMusicSystem.ClearSound();
     }
 
     private void Update()
@@ -131,6 +140,27 @@ public class CarController : MonoBehaviour, Entety, IInteractable
         }
     }
 
+    #region Pause Handler
+    
+    private void HandlePauseState(bool isPaused) 
+    { 
+        if (isPaused) 
+        { 
+            StopSound(); 
+            sfxMusicSystem?.StopSound(); 
+        } 
+        else 
+        { 
+            if (driving && GameManager.instatiate != null && GameManager.instatiate.RunningGame) 
+            { 
+                ResumeSound(); 
+            } 
+            sfxMusicSystem?.ResumeSound(); 
+        } 
+    }
+    
+    #endregion
+
     #region Physics Freeze / Unfreeze
     
     private void FreezePhysics()
@@ -157,63 +187,50 @@ public class CarController : MonoBehaviour, Entety, IInteractable
 
     private void UpdateEngineSound()
     {
-        if (engineSound == null || !driving) return;
+        if (!driving) return;
         
         if (GameManager.instatiate != null && !GameManager.instatiate.RunningGame)
         {
-            if (engineSound.isPlaying)
-                engineSound.Pause();
+            if (IsPlaying())
+                StopSound();
             return;
         }
         
-        if (!engineSound.isPlaying && driving)
+        if (!IsPlaying() && driving)
         {
-            engineSound.Play();
+            PlaySound();
         }
         
         float speed = rb.velocity.magnitude;
         float t = Mathf.Clamp01(speed / maxSpeedForPitch);
-        engineSound.pitch = Mathf.Lerp(minPitch, maxPitch, t);
-        engineSound.volume = Mathf.Lerp(0.3f, 1f, t);
+        float pitch = Mathf.Lerp(minPitch, maxPitch, t);
+        float volume = Mathf.Lerp(0.3f, 1f, t) * 0.25f;
+        
+        SetPitch(pitch);
+        SetVolume(volume);
     }
 
     private void PlayEnterSound()
     {
-        if (enterSound == null || audioSource == null) return;
+        if (enterSound == null || sfxMusicSystem == null) return;
         if (GameManager.instatiate != null && !GameManager.instatiate.RunningGame) return;
         
-        audioSource.PlayOneShot(enterSound, 1f);
+        sfxMusicSystem.ShotSound(enterSound);
     }
 
     private void PlayExitSound()
     {
-        if (exitSound == null || audioSource == null) return;
+        if (exitSound == null || sfxMusicSystem == null) return;
         if (GameManager.instatiate != null && !GameManager.instatiate.RunningGame) return;
         
-        audioSource.PlayOneShot(exitSound, 1f);
+        sfxMusicSystem.ShotSound(exitSound);
     }
 
     private void StopEngineSound()
     {
-        if (engineSound != null && engineSound.isPlaying)
+        if (IsPlaying())
         {
-            engineSound.Stop();
-        }
-    }
-
-    public void PauseEngineSound()
-    {
-        if (engineSound != null && engineSound.isPlaying)
-        {
-            engineSound.Pause();
-        }
-    }
-
-    public void ResumeEngineSound()
-    {
-        if (engineSound != null && !engineSound.isPlaying && driving)
-        {
-            engineSound.Play();
+            StopSound();
         }
     }
 
@@ -241,9 +258,11 @@ public class CarController : MonoBehaviour, Entety, IInteractable
         
         UnfreezePhysicsForDriving();
         
+
         SetOutlineState(false);
 
         player = playerObject.GetComponent<PlayerController>();
+        playerObject.GetComponent<CharacterController>().enabled = false;
         playerCamera = player.playerCamera;
 
         cameraTransform = playerCamera.transform;
@@ -265,17 +284,18 @@ public class CarController : MonoBehaviour, Entety, IInteractable
         rb.velocity = Vector3.zero;
         rb.angularVelocity = Vector3.zero;
         
-        if (engineSound != null)
+        // Запускаем звук двигателя с задержкой
+        if (engineClip != null)
         {
-            Invoke(nameof(StartEngineDelayed), 0.2f);
+            Invoke(nameof(StartEngineDelayed), 0.8f);
         }
     }
     
     private void StartEngineDelayed()
     {
-        if (driving && engineSound != null && !engineSound.isPlaying)
+        if (driving && !IsPlaying())
         {
-            engineSound.Play();
+            PlaySound();
         }
     }
 
@@ -312,7 +332,7 @@ public class CarController : MonoBehaviour, Entety, IInteractable
 
         player.transform.SetPositionAndRotation(
             pos,
-            transform.rotation
+            transform.rotation = Quaternion.identity
         );
 
         cameraTransform.SetParent(savedCameraParent);
@@ -324,11 +344,12 @@ public class CarController : MonoBehaviour, Entety, IInteractable
         outline.enabled = true;
 
         ResetOutline();
-
+        player.GetComponent<CharacterController>().enabled = true;
         player = null;
         playerCamera = null;
         cameraTransform = null;
     }
+
 
     #endregion
 
@@ -429,11 +450,14 @@ public class CarController : MonoBehaviour, Entety, IInteractable
     {
         if (driving)
             return;
-
         if(Inventory.instatiate.HandItem("Car key"))
             EnterCar(
                 GameObject.FindGameObjectWithTag("Player")
             );
+        else
+        {
+            sfxMusicSystem.ShotSound(NoKeys);
+        }
     }
 
     #endregion

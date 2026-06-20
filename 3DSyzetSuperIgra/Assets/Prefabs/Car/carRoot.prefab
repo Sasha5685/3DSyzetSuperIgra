@@ -223,12 +223,14 @@ MonoBehaviour:
   cameraSmooth: 8
   cameraPitch: 10
   handBrakeForce: 2000
-  engineSound: {fileID: 2140586593490071730}
+  engineClip: {fileID: 8300000, guid: 771ce407ce807b74885ec23ebd1e6647, type: 3}
   enterSound: {fileID: 8300000, guid: 44b63b0db16ce624b97e45ebde0a0971, type: 3}
   exitSound: {fileID: 8300000, guid: bc37ad25465405a428a26ff0facd9a7b, type: 3}
+  NoKeys: {fileID: 8300000, guid: f6c653318616d904d859ee05966b4444, type: 3}
   minPitch: 0.5
   maxPitch: 2
   maxSpeedForPitch: 30
+  sfxMixerGroup: {fileID: 7238510774079070348, guid: b96f1d42b2fdf634989c36cd5ca728d0, type: 2}
   defaultWidth: 9
   defaultColor: {r: 0.4292453, g: 0.7921708, b: 1, a: 0.7058824}
   highlightWidth: 14

@@ -105,6 +105,25 @@ public class PlayerController : MonoBehaviour
     private const string MUSIC_VOLUME_PARAM = "MusicVolume";
     private const string SFX_VOLUME_PARAM = "SFXVolume";
 
+
+    [Header("Crouch Settings")]
+    [SerializeField] private float crouchHeight = 0.5f;
+    [SerializeField] private float crouchSpeed = 10f;
+    [SerializeField] private float crouchCameraOffset = 0.3f;
+    [SerializeField] private KeyCode crouchKey = KeyCode.LeftControl;
+    [SerializeField] private float crouchWalkSpeedMultiplier = 0.3f; // 50% скорости при приседе
+    [SerializeField] private float crouchJumpMultiplier = 0.2f; // 20% прыжка при приседе
+
+    private float originalHeight;
+    private Vector3 originalCameraPosition;
+    private bool isCrouching = false;
+    private float currentCrouchProgress = 0f;
+    private float originalJumpHeight;
+    [Header("Run Settings")]
+    [SerializeField] private KeyCode runKey = KeyCode.LeftShift;
+    [SerializeField] private Button runButton;
+
+    private bool isRunning = false;
     private void Awake()
     {
         instatiate = this;
@@ -115,8 +134,14 @@ public class PlayerController : MonoBehaviour
         
         baseWalkSpeed = walkSpeed;
         baseRunSpeed = runSpeed;
+        originalHeight = characterController.height;
+        originalCameraPosition = playerCamera.transform.localPosition;
+        originalJumpHeight = jumpHeight;
     }
-
+    public void ToggleRun()
+    {
+        isRunning = !isRunning;
+    }
     private void Start()
     {
         // Дополнительно применяем настройки при старте
@@ -149,11 +174,47 @@ public class PlayerController : MonoBehaviour
             HandleTouchLook();
             HandleMobileMovement();
         }
-
+        if (!isInputLocked && RunningGame)
+        {
+            HandleCrouchInput();
+        }
         HandleJump();
         ApplyGravity();
     }
+    private void HandleCrouchInput()
+    {
+        bool crouchPressed = Input.GetKeyDown(crouchKey);
+        
+        if (crouchPressed && !isCrouching)
+        {
+            isCrouching = true;
+        }
+        else if (crouchPressed && isCrouching)
+        {
+            isCrouching = false;
+        }
+        
+        // Плавное изменение высоты
+        float targetProgress = isCrouching ? 1f : 0f;
+        currentCrouchProgress = Mathf.MoveTowards(currentCrouchProgress, targetProgress, Time.deltaTime * crouchSpeed);
+        
+        // Изменяем высоту CharacterController
+        float targetHeight = Mathf.Lerp(originalHeight, crouchHeight, currentCrouchProgress);
+        characterController.height = targetHeight;
+        
+        // Изменяем положение камеры
+        Vector3 targetCamPos = originalCameraPosition;
+        targetCamPos.y -= currentCrouchProgress * crouchCameraOffset;
+        playerCamera.transform.localPosition = Vector3.Lerp(playerCamera.transform.localPosition, targetCamPos, Time.deltaTime * crouchSpeed);
+        
+        // Изменяем скорость прыжка
+        jumpHeight = Mathf.Lerp(originalJumpHeight, originalJumpHeight * crouchJumpMultiplier, currentCrouchProgress);
+    }
 
+    public void ToggleCrouch()
+    {
+        isCrouching = !isCrouching;
+    }
     #region Audio Settings with AudioMixer
 
     private void ApplyAudioSettings()
@@ -709,7 +770,19 @@ public class PlayerController : MonoBehaviour
 
         float horizontal = Input.GetAxis("Horizontal");
         float vertical = Input.GetAxis("Vertical");
-        currentSpeed = Input.GetKey(KeyCode.LeftShift) ? runSpeed : walkSpeed;
+        
+        float currentWalkSpeed = walkSpeed;
+        float currentRunSpeed = runSpeed;
+        
+        if (isCrouching)
+        {
+            currentWalkSpeed *= crouchWalkSpeedMultiplier;
+            currentRunSpeed *= crouchWalkSpeedMultiplier;
+        }
+        
+        // Зажата клавиша ИЛИ включен Toogle
+        bool runInput = Input.GetKey(runKey) || isRunning;
+        currentSpeed = runInput ? currentRunSpeed : currentWalkSpeed;
 
         Vector3 move = (transform.right * horizontal + transform.forward * vertical);
         if (move.magnitude > 1f) move.Normalize();
@@ -730,7 +803,10 @@ public class PlayerController : MonoBehaviour
         {
             horizontal = movementJoystick.Horizontal;
             vertical = movementJoystick.Vertical;
-            currentSpeed = walkSpeed;
+            
+            // Если приседаем - уменьшаем скорость
+            float speedMultiplier = isCrouching ? crouchWalkSpeedMultiplier : 1f;
+            currentSpeed = walkSpeed * speedMultiplier;
         }
 
         Vector3 move = (transform.right * horizontal + transform.forward * vertical);
@@ -766,6 +842,7 @@ public class PlayerController : MonoBehaviour
 
         if (shouldJump)
         {
+            // Используем текущий jumpHeight (уже изменен в HandleCrouchInput)
             velocity.y = Mathf.Sqrt(jumpHeight * -2f * gravity);
         }
     }
@@ -867,21 +944,4 @@ public class PlayerController : MonoBehaviour
 
     #endregion
 
-    #region Unity Events
-
-    private void OnApplicationQuit()
-    {
-        SaveSensitivity();
-        SaveAudioSettings();
-        ResetSpeed();
-    }
-
-    private void OnDisable()
-    {
-        SaveSensitivity();
-        SaveAudioSettings();
-        ResetSpeed();
-    }
-
-    #endregion
 }

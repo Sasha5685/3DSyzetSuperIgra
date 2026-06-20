@@ -25,7 +25,14 @@ public class GameManager : MonoBehaviour
         DeviceType = deviceIsDesktop ? "PC" : "Mobile";
         StartGame();
     }
-    
+    private void Start()
+    {
+        Invoke(nameof(InvokePauseStopStart), 0.5f);
+    }
+    private void InvokePauseStopStart()
+    {
+        SetSettingsPanel(false);
+    }
     private void StartGame()
     {
         PlayerController.Initialized(DeviceType);
@@ -38,11 +45,10 @@ public class GameManager : MonoBehaviour
             SetSettingsPanel(!IsActiveSettings);
         }
     }
-    
-    // В GameManager в методе SetSettingsPanel:
     public void SetSettingsPanel(bool active)
     {
         IsActiveSettings = active;
+        OnPauseStateChanged.Invoke(IsActiveSettings);
         SettingsPanel.SetActive(active);
         Cursor.visible = active;
         
@@ -53,22 +59,12 @@ public class GameManager : MonoBehaviour
             RunningGame = false;
             PlayerController.StopGame();
             PlayerController.SetAdButtonsEnabled(false);
-            
-            if (dialogSystem != null)
-            {
-                dialogSystem.PauseDialogSound();
-            }
         }
         else
         {
             RunningGame = true;
             PlayerController.ResumeGame();
             PlayerController.SetAdButtonsEnabled(true);
-            
-            if (dialogSystem != null)
-            {
-                dialogSystem.ResumeDialogSound();
-            }
         }
     }
 }
