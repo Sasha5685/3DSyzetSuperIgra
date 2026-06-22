@@ -383,8 +383,8 @@ MonoBehaviour:
       angleInclination: 140
       color1: {r: 1, g: 0.831, b: 0.149, a: 1}
       color2: {r: 0.36, g: 0.09, b: 1, a: 1}
-    pixelRatioEnable: 1
-    pixelRatioValue: 0.9
+    pixelRatioEnable: 0
+    pixelRatioValue: 1
     developerBuild: 0
   platformInfo:
     ownHost: 0
