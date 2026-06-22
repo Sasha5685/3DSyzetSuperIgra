@@ -121,9 +121,66 @@ public class PlayerController : MonoBehaviour
     private float originalJumpHeight;
     [Header("Run Settings")]
     [SerializeField] private KeyCode runKey = KeyCode.LeftShift;
-    [SerializeField] private Button runButton;
+    [SerializeField] private Button runButton; // Кнопка для мобильного бега (зажатие)
+    [Header("Run UI")]
+    [SerializeField] private Image runButtonImage;
+    [SerializeField] private Color runActiveColor = Color.green;
+    [SerializeField] private Color runInactiveColor = Color.white;
+    private bool isRunning = false; // Это будет true пока кнопка зажата
+    [Header("Car Controls")]
+    [SerializeField] private GameObject carControlPanel; // Панель с джойстиком для машины
+    [SerializeField] private Joystick  carJoystick; // Джойстик для управления машиной
+    [SerializeField] private Button carBrakeButton; // Кнопка тормоза для машины
+    [SerializeField] private Button carExitButton; // Кнопка выхода из машины
 
-    private bool isRunning = false;
+    private bool isInCar = false;
+    private bool carBrakePressed = false;
+    private Vector2 carInput = Vector2.zero;
+    public void SetInCar(bool inCar)
+    {
+        isInCar = inCar;
+        
+        if (isMobilePlatform)
+        {
+            // Скрываем управление персонажем
+            if (mobilePanel != null)
+                mobilePanel.SetActive(!inCar);
+            
+            // Показываем управление машиной
+            if (carControlPanel != null)
+                carControlPanel.SetActive(inCar);
+        }
+        
+        // Блокируем ввод персонажа
+        isInputLocked = inCar;
+
+    }
+
+    public float GetCarHorizontalInput()
+    {
+        if (!isInCar || !isMobilePlatform || carJoystick == null)
+            return 0f;
+        return carInput.x; // Используем сохраненное значение
+    }
+
+    public float GetCarVerticalInput()
+    {
+        if (!isInCar || !isMobilePlatform || carJoystick == null)
+            return 0f;
+        return carInput.y; // Используем сохраненное значение
+    }
+
+    public bool GetCarBrakeInput()
+    {
+        if (!isInCar || !isMobilePlatform)
+            return false;
+        
+        // Для ПК - пробел, для мобилки - кнопка
+        if (isMobilePlatform)
+            return carBrakePressed;
+        
+        return Input.GetKey(KeyCode.Space);
+    }
     private void Awake()
     {
         instatiate = this;
@@ -138,14 +195,70 @@ public class PlayerController : MonoBehaviour
         originalCameraPosition = playerCamera.transform.localPosition;
         originalJumpHeight = jumpHeight;
     }
-    public void ToggleRun()
+        // Методы для управления бегом
+    public void StartRunning()
     {
-        isRunning = !isRunning;
+        isRunning = true;
+        UpdateRunButtonVisual();
+    }
+
+    public void StopRunning()
+    {
+        isRunning = false;
+        UpdateRunButtonVisual();
+    }
+
+    private void UpdateRunButtonVisual()
+    {
+        if (runButtonImage != null)
+        {
+            runButtonImage.color = isRunning ? runActiveColor : runInactiveColor;
+        }
     }
     private void Start()
     {
         // Дополнительно применяем настройки при старте
         ApplyAudioSettings();
+        SetupCarControls(); 
+    }
+    private void SetupCarControls()
+    {
+        if (carBrakeButton != null)
+        {
+            // Добавляем EventTrigger для зажатия тормоза
+            EventTrigger trigger = carBrakeButton.gameObject.GetComponent<EventTrigger>();
+            if (trigger == null)
+                trigger = carBrakeButton.gameObject.AddComponent<EventTrigger>();
+            
+            EventTrigger.Entry pointerDown = new EventTrigger.Entry();
+            pointerDown.eventID = EventTriggerType.PointerDown;
+            pointerDown.callback.AddListener((data) => { SetCarBrake(true); });
+            trigger.triggers.Add(pointerDown);
+            
+            EventTrigger.Entry pointerUp = new EventTrigger.Entry();
+            pointerUp.eventID = EventTriggerType.PointerUp;
+            pointerUp.callback.AddListener((data) => { SetCarBrake(false); });
+            trigger.triggers.Add(pointerUp);
+        }
+        
+        if (carExitButton != null)
+        {
+            carExitButton.onClick.AddListener(() => {
+                if (isInCar)
+                {
+                    // Находим машину и вызываем выход
+                    CarController car = FindObjectOfType<CarController>();
+                    if (car != null)
+                        car.ExitCar();
+                }
+            });
+        }
+    }
+
+
+    public void SetCarBrake(bool pressed)
+    {
+        carBrakePressed = pressed;
     }
 
     private void Update()
@@ -160,6 +273,14 @@ public class PlayerController : MonoBehaviour
             {
                 ShowAdvReward("SpeedPlayer");
             }
+        }
+
+        // ВАЖНО: Обновляем ввод с джойстика машины ДО проверки isInputLocked
+        if (isInCar && isMobilePlatform && carJoystick != null)
+        {
+            carInput = new Vector2(carJoystick.Horizontal, carJoystick.Vertical);
+            // Для отладки - раскомментируйте чтобы проверить
+            // Debug.Log($"Car Input: {carInput}");
         }
 
         if (isInputLocked || !RunningGame) return;
@@ -780,7 +901,7 @@ public class PlayerController : MonoBehaviour
             currentRunSpeed *= crouchWalkSpeedMultiplier;
         }
         
-        // Зажата клавиша ИЛИ включен Toogle
+        // Для ПК: зажата клавиша ИЛИ (для мобилки isRunning)
         bool runInput = Input.GetKey(runKey) || isRunning;
         currentSpeed = runInput ? currentRunSpeed : currentWalkSpeed;
 
@@ -804,17 +925,17 @@ public class PlayerController : MonoBehaviour
             horizontal = movementJoystick.Horizontal;
             vertical = movementJoystick.Vertical;
             
-            // Если приседаем - уменьшаем скорость
             float speedMultiplier = isCrouching ? crouchWalkSpeedMultiplier : 1f;
-            currentSpeed = walkSpeed * speedMultiplier;
+            float baseSpeed = isRunning ? runSpeed : walkSpeed; // isRunning true пока кнопка зажата
+            currentSpeed = baseSpeed * speedMultiplier;
         }
 
         Vector3 move = (transform.right * horizontal + transform.forward * vertical);
         if (move.magnitude > 1f) move.Normalize();
         
         characterController.Move(move * currentSpeed * Time.deltaTime);
+        // НЕ сбрасываем isRunning!
     }
-
     private void UpdateGroundedState()
     {
         isGrounded = Physics.CheckSphere(groundCheck.position, groundDistance, groundMask);

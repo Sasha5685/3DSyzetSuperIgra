@@ -648,6 +648,17 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1418599553}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &805838757 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 1458286908733013402, guid: b812d84d49ac32c4cb3a66741abb56e3, type: 3}
+  m_PrefabInstance: {fileID: 6824506987546108565}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 45977bbae16431c46a013576a1aea384, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1060139607
 GameObject:
   m_ObjectHideFlags: 0
@@ -1564,7 +1575,6 @@ MonoBehaviour:
   openSound: {fileID: 8300000, guid: 44b63b0db16ce624b97e45ebde0a0971, type: 3}
   RepitOpenDoorSound: {fileID: 0}
   closeSound: {fileID: 8300000, guid: bc37ad25465405a428a26ff0facd9a7b, type: 3}
-  NoKeys: {fileID: 0}
   doorCollider: {fileID: 2073058625}
   playerLayer:
     serializedVersion: 2
@@ -1935,6 +1945,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 96390288207885304, guid: b812d84d49ac32c4cb3a66741abb56e3, type: 3}
+      propertyPath: m_Name
+      value: ExitCar
+      objectReference: {fileID: 0}
     - target: {fileID: 222741296764939715, guid: b812d84d49ac32c4cb3a66741abb56e3, type: 3}
       propertyPath: m_AnchoredPosition.x
       value: 5
@@ -1979,7 +1993,47 @@ PrefabInstance:
       propertyPath: m_AnchorMax.y
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 1002152887989185567, guid: b812d84d49ac32c4cb3a66741abb56e3, type: 3}
+      propertyPath: m_fontSize
+      value: 40.43
+      objectReference: {fileID: 0}
+    - target: {fileID: 1002152887989185567, guid: b812d84d49ac32c4cb3a66741abb56e3, type: 3}
+      propertyPath: m_fontAsset
+      value: 
+      objectReference: {fileID: 11400000, guid: 034d74cac23dad842ab12c8e734b89dd, type: 2}
+    - target: {fileID: 1002152887989185567, guid: b812d84d49ac32c4cb3a66741abb56e3, type: 3}
+      propertyPath: m_fontColor.b
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1002152887989185567, guid: b812d84d49ac32c4cb3a66741abb56e3, type: 3}
+      propertyPath: m_fontColor.g
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1002152887989185567, guid: b812d84d49ac32c4cb3a66741abb56e3, type: 3}
+      propertyPath: m_fontColor.r
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1002152887989185567, guid: b812d84d49ac32c4cb3a66741abb56e3, type: 3}
+      propertyPath: m_fontSizeBase
+      value: 40.43
+      objectReference: {fileID: 0}
+    - target: {fileID: 1002152887989185567, guid: b812d84d49ac32c4cb3a66741abb56e3, type: 3}
+      propertyPath: m_sharedMaterial
+      value: 
+      objectReference: {fileID: 2013047742041850953, guid: 034d74cac23dad842ab12c8e734b89dd, type: 2}
+    - target: {fileID: 1002152887989185567, guid: b812d84d49ac32c4cb3a66741abb56e3, type: 3}
+      propertyPath: m_fontColor32.rgba
+      value: 4294967295
+      objectReference: {fileID: 0}
+    - target: {fileID: 1002152887989185567, guid: b812d84d49ac32c4cb3a66741abb56e3, type: 3}
+      propertyPath: m_hasFontAssetChanged
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 1278174793550436014, guid: b812d84d49ac32c4cb3a66741abb56e3, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1303940032968914462, guid: b812d84d49ac32c4cb3a66741abb56e3, type: 3}
       propertyPath: m_IsActive
       value: 0
       objectReference: {fileID: 0}
@@ -2140,6 +2194,10 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8126500327504811760, guid: b812d84d49ac32c4cb3a66741abb56e3, type: 3}
+      propertyPath: carJoystick
+      value: 
+      objectReference: {fileID: 805838757}
+    - target: {fileID: 8126500327504811760, guid: b812d84d49ac32c4cb3a66741abb56e3, type: 3}
       propertyPath: touchLookSpeedMultiplier
       value: 1.5
       objectReference: {fileID: 0}
@@ -2206,6 +2264,22 @@ PrefabInstance:
     - target: {fileID: 8802222790185026025, guid: b812d84d49ac32c4cb3a66741abb56e3, type: 3}
       propertyPath: m_AnchoredPosition.x
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8832748830349538985, guid: b812d84d49ac32c4cb3a66741abb56e3, type: 3}
+      propertyPath: m_Color.b
+      value: 0.23820755
+      objectReference: {fileID: 0}
+    - target: {fileID: 8832748830349538985, guid: b812d84d49ac32c4cb3a66741abb56e3, type: 3}
+      propertyPath: m_Color.g
+      value: 0.23820755
+      objectReference: {fileID: 0}
+    - target: {fileID: 8832748830349538985, guid: b812d84d49ac32c4cb3a66741abb56e3, type: 3}
+      propertyPath: m_Color.r
+      value: 0.9528302
+      objectReference: {fileID: 0}
+    - target: {fileID: 8832748830349538985, guid: b812d84d49ac32c4cb3a66741abb56e3, type: 3}
+      propertyPath: m_PixelsPerUnitMultiplier
+      value: 2.14
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

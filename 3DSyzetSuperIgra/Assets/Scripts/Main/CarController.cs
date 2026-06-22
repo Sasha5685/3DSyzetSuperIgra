@@ -60,7 +60,13 @@ public class CarController : MusicSystem, Entety, IInteractable
     public GameObject SmallCursor;
     
     private RigidbodyConstraints savedConstraints;
-    
+    [Header("Mobile Controls")]
+    [SerializeField] private float mobileSteeringSensitivity = 1f;
+    [SerializeField] private float mobileAccelerationSensitivity = 1f;
+
+    private float mobileSteeringInput = 0f;
+    private float mobileAccelerationInput = 0f;
+    private bool mobileBrakeInput = false;
     private void Awake()
     {
         rb = GetComponent<Rigidbody>();
@@ -112,16 +118,45 @@ public class CarController : MusicSystem, Entety, IInteractable
         if (!driving)
             return;
 
-        if (Input.GetKeyDown(KeyCode.E) &&
-            Time.time - enterTime >= exitDelay)
+        // Получаем ввод с мобильного джойстика
+        GetMobileInputs();
+
+        if (Input.GetKeyDown(KeyCode.E) && Time.time - enterTime >= exitDelay)
         {
             ExitCar();
         }
 
-        if (Input.GetKey(KeyCode.Space))
+        if (Input.GetKey(KeyCode.Space) || mobileBrakeInput)
             HandBrake();
         
         UpdateEngineSound();
+    }
+
+    private void GetMobileInputs()
+    {
+        if (player != null)
+        {
+            // Получаем ввод с джойстика через PlayerController
+            float horizontal = player.GetCarHorizontalInput();
+            float vertical = player.GetCarVerticalInput();
+            
+            mobileSteeringInput = horizontal * mobileSteeringSensitivity;
+            mobileAccelerationInput = vertical * mobileAccelerationSensitivity;
+            mobileBrakeInput = player.GetCarBrakeInput();
+        }
+    }
+
+    private void FixedUpdate()
+    {
+        if (!driving) return;
+        
+        // Используем мобильный ввод если есть, иначе клавиатуру
+        float steerInput = mobileSteeringInput != 0f ? mobileSteeringInput : Input.GetAxis("Horizontal");
+        float accelInput = mobileAccelerationInput != 0f ? mobileAccelerationInput : Input.GetAxis("Vertical");
+        bool brakeInput = mobileBrakeInput || Input.GetKey(KeyCode.Space);
+        
+        // Применяем управление
+        drive.Move(steerInput, accelInput, brakeInput);
     }
 
     private void LateUpdate()
@@ -138,6 +173,12 @@ public class CarController : MusicSystem, Entety, IInteractable
                 highlightWidth +
                 Mathf.Sin(pulseTimer) * pulseAmplitude;
         }
+    }
+    private bool carBrakePressed = false;
+
+    public void SetCarBrake(bool pressed)
+    {
+        carBrakePressed = pressed;
     }
 
     #region Pause Handler
@@ -238,58 +279,61 @@ public class CarController : MusicSystem, Entety, IInteractable
 
     #region Enter Exit
 
-    public void EnterCar(GameObject playerObject)
+public void EnterCar(GameObject playerObject)
+{
+    if (driving)
+        return;
+    
+    PlayerController.instatiate.SetInCar(true);
+    
+    Inventory.instatiate.BlockInventory = true;
+    Inventory.instatiate.UIInventory.SetActive(false);
+    PlayEnterSound();
+    
+    SmallCursor.SetActive(false);
+    TextHelp.SetActive(true);
+    InvokeManager.instatiate.SendMessageEvent("GetInCar");
+    enterTime = Time.time;
+    HandItem.instatiate.itemHolder.gameObject.SetActive(false);
+    
+    visibleObject.SetIgnoreManager(true);
+    
+    rb.drag = 0.2f;
+    rb.angularDrag = 5f;
+    
+    UnfreezePhysicsForDriving();
+    
+    SetOutlineState(false);
+
+    player = playerObject.GetComponent<PlayerController>();
+    playerObject.GetComponent<CharacterController>().enabled = false;
+    playerCamera = player.playerCamera;
+
+    cameraTransform = playerCamera.transform;
+
+    savedCameraParent = cameraTransform.parent;
+    savedCameraLocalPosition = cameraTransform.localPosition;
+    savedCameraLocalRotation = cameraTransform.localRotation;
+
+    cameraTransform.SetParent(null);
+
+    // ❌ НЕ ОТКЛЮЧАЙТЕ player!
+    // player.enabled = false; // УБЕРИТЕ ЭТУ СТРОКУ
+
+    driving = true;
+
+    outline.enabled = false;
+
+    drive.enabled = true;
+
+    rb.velocity = Vector3.zero;
+    rb.angularVelocity = Vector3.zero;
+    
+    if (engineClip != null)
     {
-        if (driving)
-            return;
-        
-        PlayEnterSound();
-        
-        SmallCursor.SetActive(false);
-        TextHelp.SetActive(true);
-        InvokeManager.instatiate.SendMessageEvent("GetInCar");
-        enterTime = Time.time;
-        HandItem.instatiate.itemHolder.gameObject.SetActive(false);
-        
-        visibleObject.SetIgnoreManager(true);
-        
-        rb.drag = 0.2f;
-        rb.angularDrag = 5f;
-        
-        UnfreezePhysicsForDriving();
-        
-
-        SetOutlineState(false);
-
-        player = playerObject.GetComponent<PlayerController>();
-        playerObject.GetComponent<CharacterController>().enabled = false;
-        playerCamera = player.playerCamera;
-
-        cameraTransform = playerCamera.transform;
-
-        savedCameraParent = cameraTransform.parent;
-        savedCameraLocalPosition = cameraTransform.localPosition;
-        savedCameraLocalRotation = cameraTransform.localRotation;
-
-        cameraTransform.SetParent(null);
-
-        player.enabled = false;
-
-        driving = true;
-
-        outline.enabled = false;
-
-        drive.enabled = true;
-
-        rb.velocity = Vector3.zero;
-        rb.angularVelocity = Vector3.zero;
-        
-        // Запускаем звук двигателя с задержкой
-        if (engineClip != null)
-        {
-            Invoke(nameof(StartEngineDelayed), 0.8f);
-        }
+        Invoke(nameof(StartEngineDelayed), 0.8f);
     }
+}
     
     private void StartEngineDelayed()
     {
@@ -303,7 +347,10 @@ public class CarController : MusicSystem, Entety, IInteractable
     {
         if (!driving)
             return;
+        PlayerController.instatiate.SetInCar(false); // ВАЖНО: выключаем режим машины
         
+        Inventory.instatiate.BlockInventory = false;
+        Inventory.instatiate.UIInventory.SetActive(true);
         StopEngineSound();
         PlayExitSound();
         
