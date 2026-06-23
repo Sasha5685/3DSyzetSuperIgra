@@ -25,12 +25,16 @@ public class Inventory : MusicSystem
     private bool isInitialized = false;
     public GameManager GameManager;
 
-
+    public GameObject UIInventory;
+    public bool BlockInventory;
+    
+    public GameObject UIKickObject;
     void Awake()
     {
         instatiate = this;
-        
+        UIKickObject.SetActive(false);
         InitSystem(sfxMixerGroup);
+        
     }
 
     void Start()
@@ -70,6 +74,7 @@ public class Inventory : MusicSystem
     void Update()
     {
         if (!isInitialized) return;
+        if (BlockInventory) return;
         if (SlotsInventory == null || SlotsInventory.Length == 0) return;
         
         float scrollWheel = Input.GetAxis("Mouse ScrollWheel");
@@ -115,7 +120,6 @@ public class Inventory : MusicSystem
             Debug.LogWarning("Выбранный слот пуст");
             return;
         }
-
         BaseItem itemToThrow = currentSlot.Item;
         
         if (itemToThrow == null || itemToThrow.itemPrefab == null)
@@ -137,7 +141,7 @@ public class Inventory : MusicSystem
         Vector3 throwDirection = GetThrowDirection();
         rb.AddForce(throwDirection * throwForce + Vector3.up * throwUpwardForce, ForceMode.Impulse);
         rb.AddTorque(Random.insideUnitSphere * 5f, ForceMode.Impulse);
-        
+                UIKickObject.SetActive(false);
         currentSlot.SetItem(null, null);
         
         if (handItem != null && handItem.GetCurrentItem() == itemToThrow)
@@ -214,6 +218,7 @@ public class Inventory : MusicSystem
     
     public void SelectSlot(Slot slot)
     {
+        UIKickObject.SetActive(false);
         foreach (var s in SlotsInventory)
         {
             if (s != null && s != slot)
@@ -239,6 +244,7 @@ public class Inventory : MusicSystem
             if (slot.Item != null)
             {
                 handItem.ShowItem(slot.Item);
+                        UIKickObject.SetActive(true);
             }
             else
             {
@@ -291,7 +297,7 @@ public class Inventory : MusicSystem
                 if (currentSlot != null && currentSlot == SlotsInventory[i])
                 {
                     if (handItem != null)
-                    {
+                    {                        UIKickObject.SetActive(true);
                         handItem.ShowItem(NewItem);
                     }
                 }
