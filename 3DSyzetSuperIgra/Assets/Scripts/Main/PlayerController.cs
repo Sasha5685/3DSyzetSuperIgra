@@ -73,7 +73,7 @@ public class PlayerController : MonoBehaviour
     private Vector2 previousTouchPosition;
 
     // Game state
-    public bool RunningGame { get; private set; } = true;
+    public bool RunningGame = true;
 
     // Save keys
     private const string SENSITIVITY_KEY = "CameraSensitivity";
@@ -788,7 +788,13 @@ public class PlayerController : MonoBehaviour
         cameraRotationX = Mathf.Clamp(cameraRotationX, lookDownLimit, lookUpLimit);
         playerCamera.transform.localRotation = Quaternion.Euler(cameraRotationX, 0f, 0f);
     }
-
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.gameObject.layer == 2)
+        {
+            InvokeManager.instatiate.SendMessageEvent("TriggerIgnoreRayCast");
+        }
+    }
     private void HandleTouchLook()
     {
         if (isInputLocked) return;

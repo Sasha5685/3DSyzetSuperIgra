@@ -1,3 +1,3 @@
-﻿Build path: C:/Users/Home/Pictures/farfq
-Build number: 9
+﻿Build path: C:/Users/Home/Pictures/Build
+Build number: 10
 PluginYG version: 2.0092

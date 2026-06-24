@@ -3,8 +3,11 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Audio;
+using UnityEngine.Playables;
+using UnityEngine.Timeline;
 
-public class InvokeManager : MonoBehaviour
+public class InvokeManager : MusicSystem
 {
     public static InvokeManager instatiate;
     public GameObject Player;
@@ -20,14 +23,35 @@ public class InvokeManager : MonoBehaviour
     private float lastCheckTime;
 
     private Inventory Inventory;
+
+    [SerializeField] private GameObject[] SpawnObjects;
+    [SerializeField] private PlayableDirector PlayableDirector;
+    [SerializeField] private TimelineAsset[] Playables;
+    [SerializeField] private GameObject[] TimeLineObjects;
+    [SerializeField] private AudioMixerGroup AudioMixerGroup;
+    [SerializeField] private AudioClip[] AudioClips;
+    [SerializeField] private GameObject Canvas;
+    public GameObject PlayerObjects;
     private void Start()
     {
+        InitSystem(AudioMixerGroup, false);
         instatiate = this;
         GameManager = GameManager.instatiate;
         LoadIdHistory();
         StartCoroutine(DelayedStart());
         Inventory = Inventory.instatiate;
+        PlayableDirector.stopped += OnCutsceneEnd;
 
+
+    }
+    private void OnDestroy()
+    {
+        PlayableDirector.stopped -= OnCutsceneEnd;
+    }
+    // Вызывается при окончании кат-сцены
+    private void OnCutsceneEnd(PlayableDirector director)
+    {
+        if(IdHistory == 4){IdHistory++;NextHistoryMoment();}
     }
     private void Update()
     {
@@ -65,7 +89,7 @@ public class InvokeManager : MonoBehaviour
         }
         else if(Event == "PlayerInGrannyHouse")
         {
-           // if(DialogSystem.IdDialog == 1){IdHistory++;NextHistoryMoment();}
+           
         }
         else if(Event == "ClickToPersonGuguGaga")
         {
@@ -83,6 +107,11 @@ public class InvokeManager : MonoBehaviour
         {
             if(IdHistory == 2){IdHistory++;NextHistoryMoment();}
         }
+        else if(Event == "TriggerIgnoreRayCast")
+        {
+            if(IdHistory == 3){IdHistory++;NextHistoryMoment();}
+            if(IdHistory == 5){IdHistory++;NextHistoryMoment();}
+        }
     }
     public void NextDialog()
     {
@@ -93,8 +122,10 @@ public class InvokeManager : MonoBehaviour
         if(IdHistory == 0){SmallTaskText.gameObject.SetActive(true);SmallTaskText.text = SmallTask[3].GetString(GameManager.Lang); Arrow.SetActive(false);}
         if(IdHistory == 1){NextDialog();SmallTaskText.gameObject.SetActive(true);SmallTaskText.text = SmallTask[0].GetString(GameManager.Lang);if(ArrowObjects[0]!= null){Arrow.GetComponent<ArrowLineRenderer>().endObject = ArrowObjects[0].transform; Arrow.SetActive(true);}}
         if(IdHistory == 2){SmallTaskText.gameObject.SetActive(true);SmallTaskText.text = SmallTask[1].GetString(GameManager.Lang);Arrow.GetComponent<ArrowLineRenderer>().endObject = ArrowObjects[1].transform; Arrow.SetActive(true);}
-        if(IdHistory == 3){SmallTaskText.gameObject.SetActive(true);SmallTaskText.text = SmallTask[2].GetString(GameManager.Lang); Arrow.SetActive(false);}
-
+        if(IdHistory == 3){SmallTaskText.gameObject.SetActive(true);SmallTaskText.text = SmallTask[2].GetString(GameManager.Lang); Arrow.SetActive(false);SpawnObjects[0].SetActive(true);}
+        if(IdHistory == 4){PlayableDirector.playableAsset = Playables[0];Canvas.SetActive(false);PlayableDirector.Play();PlayerController.instatiate.RunningGame = false;Inventory.instatiate.BlockInventory = true;TimeLineObjects[0].SetActive(true);TimeLineObjects[1].SetActive(true);PlayerObjects.SetActive(false);}
+        if(IdHistory == 5){PlayerController.instatiate.RunningGame = true;Canvas.SetActive(true);Inventory.instatiate.BlockInventory = false;SpawnObjects[0].SetActive(false);SpawnObjects[1].SetActive(true);TimeLineObjects[0].SetActive(false);TimeLineObjects[1].SetActive(false);PlayerObjects.SetActive(true);}
+        if(IdHistory == 6){SpawnObjects[1].SetActive(false);PlaySound(AudioClips[0]);SpawnObjects[0].SetActive(false);}
     }
 
     private void LoadIdHistory()
